@@ -1,6 +1,6 @@
 <?php
 
-class User {
+class User extends Base {
     //Status do usuário 
     const USR_INACTIVE   = -2;
     const USR_UNKNOW     = -1;
@@ -8,17 +8,14 @@ class User {
     const USR_PW_INVALID = -3;
     const USR_TIMEOUT    = 55;
 
-    //Conexão com o Banco
-	protected $DB;
-
     public $id = 0;
     public $name;
+    public $email;
 
-    public function __construct($id, $name) {
-        $this->id   = $id;
-        $this->name = $name;
-        $this->DB   = DBConnection::getInstance();
-        $this->getClients();
+    public function __construct(DBConnection $DB, $arrData = null, $executeParent = true){
+        if ($executeParent === true) {
+            parent::__construct($DB, new User($DB, null, false), $arrData);
+        }
     }
 
     final static function login($user, $passwd) {   
@@ -26,11 +23,11 @@ class User {
         $DB     = DBConnection::getInstance();
         
         try {
-        	$result = $DB->fetch(Table::USER, 'id, name', "(login = '$user' or email = '$user') AND password = '$passwd'");
+        	$result = $DB->fetch(Table::USER, 'id, name, email', "email = '$user' AND password = '$passwd'");
 
             if (empty($result)) return false;
             else                return (is_array($result))
-                                        ? self::handleLoginResult($result[0])
+                                        ? self::handleLoginResult($DB, $result[0])
                                         : self::USR_TIMEOUT;
         }
         catch (Exception $e) {
@@ -38,46 +35,49 @@ class User {
         }
     }
 
-    final private static function handleLoginResult($result) {
+    final private static function handleLoginResult(DBConnection $DB, $result) {
         if (!isset($result['id']) || $result['id'] == '') {
             return self::USR_UNKNOW;
         }                
         else {
-            $Logged = new User($result['id'], $result['nome']);
+            $Logged = new User($DB, $result);
 
-            if (isset($_SESSION[Controller::IDX_LAST_LOGGED]) &&
-                ($Logged->id != $_SESSION[Controller::IDX_LAST_LOGGED]))
+            if (isset($_SESSION[ControllerBase::IDX_LAST_LOGGED]) &&
+                ($Logged->id != $_SESSION[ControllerBase::IDX_LAST_LOGGED]))
             {
                 session_unset();
             }
 
             self::setLogged($Logged);
-            $_SESSION[Controller::IDX_LAST_LOGGED] = $Logged->id;
+            $_SESSION[ControllerBase::IDX_LAST_LOGGED] = $Logged->id;
 
             return self::USR_LOGGED;
         }
     }
 
     final static function logout($loginMsg = null, $redirect = true) {
+        if (!isset($_SESSION[ControllerBase::IDX_LOGIN_MSG]) && empty($loginMsg))
+            $loginMsg = $_SESSION[ControllerBase::IDX_LOGIN_MSG];
+
         session_unset();
 
-        if ($loginMsg) $_SESSION[Controller::IDX_LOGIN_MSG] = $loginMsg;
+        if ($loginMsg) $_SESSION[ControllerBase::IDX_LOGIN_MSG] = $loginMsg;
 
-        if ($redirect) header('Location: index.php');
+        if ($redirect) header('Location: ./');
     }
 
     final static function setLogged($User) {
-        $_SESSION[Controller::IDX_LOGGED] = serialize($User);
+        $_SESSION[ControllerBase::IDX_LOGGED] = serialize($User);
     }
 
     final static function hasLogged() {
-        return isset($_SESSION[Controller::IDX_LOGGED]);
+        return isset($_SESSION[ControllerBase::IDX_LOGGED]);
     }	
 
     final static function getLogged() {
         if (!self::hasLogged()) return false;
         
-        return unserialize($_SESSION[Controller::IDX_LOGGED]);
+        return unserialize($_SESSION[ControllerBase::IDX_LOGGED]);
     }    
    
     public function __toString() {
