@@ -1,84 +1,55 @@
 <?php
 
-class Database {
-	protected $SQLConnection;
-    private   $tables   = array();
-    private   $args 	= array();
-    public    $dataset;
-    private   $script;
+/**
+ * <h1>Banco de Dados</h1>
+ * 
+ * <p>Responsável pela comunicação com o banco de dados.</p>
+ * 
+ * @author Leandro Medeiros
+ * @since  2015-07-08
+ * @link   http://bitbucket.org/leandro_medeiros/monsterfymvc
+ */
+final class Database {
+    /**
+     * Conexão ao Banco de Dados
+     * @var PDO
+     */
+    private static $connection;
 
-    public function __sleep() {
-        return array('tables', 'args', 'dataset', 'script');
-    }
-
-	public function __construct() {
-		$this->SQLConnection = SQLConnection::getInstance();
-        //$this->getTables();
-	}
-
-    public function addArgument($argument, $value) {
-        $this->args[':' . $argument] = $value;
-    }
-
-    public function execute($script, $keepArguments = false) {
-        $this->script = $script;
-    
-        try {
-            if (!empty($this->args)) {
-                $statement     = $this->SQLConnection->connection->prepare($this->script, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-                $this->dataset = $statement->execute($this->args);
-            }
-
-            else {
-                $statement     = $this->SQLConnection->connection->prepare($this->script);
-                $this->dataset = $statement->execute();
-            }
-            
-            if (!Lib::startsWith(strtoupper(trim($this->script)), 'SELECT')) {
-                return true;
-            }
-            else if ($this->dataset) {
-                $this->dataset = $statement->fetchAll(PDO::FETCH_ASSOC);
-                return (count($this->dataset) > 0);
-            }
-
-            if (!$keepArguments) $this->clearArguments();
+    /**
+     * <h1>Obter Conexão</h1>
+     *
+     * <p>Faz o controle do singleton.</p>
+     *
+     * @method getConnection
+     * @return PDO instância da conexão
+     * @author Leandro Medeiros
+     * @since  2015-07-09
+     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     */
+    private static function getConnection() {
+        if (!static::$connection) {
+            static::$connection = new PDO(Config::getConnectionString(),
+                                          Config::DB_USER,
+                                          Config::DB_PASSWORD,
+                                          array(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION));
         }
 
-        catch (Exception $e) {
-            Lib::log($e);
-        }
-
-        return false;
+        return static::$connection;
     }
 
-    public function clearArguments() {
-        unset($this->args);
-        $this->args = array();
-    }
-
-    public function printArguments() {
-        print_r($this->arguments);
-        Lib::log($this);
-    }
-
-    public function message($message) {
-        // echo '<pre>';
-        // echo "Executar script {$this->script} com os argumentos <br>";
-        // print_r($this->args);
-        // echo "<br>disparou a mensagem<br>";
-        // print_r($message);
-        // echo '</pre>';
-    }
-
-    public function getBlob($table, $field, $where) {
-        $query = "SELECT $field FROM $table WHERE $where";
-
-        $statement = $this->SQLConnection->connection->prepare($query);
-        $statement->execute();
-        $statement->bindColumn(1, $blob, PDO::PARAM_LOB);
-        $statement->fetch(PDO::FETCH_BOUND);
-
-        return $blob;
+    /**
+     * <h1>Preparar Script</h1>
+     *
+     * @method prepare
+     * @param  string $script Script que será executado
+     * @param  array $options Opções Extras
+     * @return PreparedStatment
+     * @author Leandro Medeiros
+     * @since  2015-07-09
+     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     */
+    public static function prepare($script, $options = array()) {
+        return self::getConnection()->prepare($script, $options);
     }
 }

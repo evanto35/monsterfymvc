@@ -11,14 +11,14 @@
             <div class="tabbable">
                 <ul class="nav nav-tabs" id="myTab">
                     <?php 
-                    foreach ($PageContent->menu as $tab): ?>
-                        <li class="<?php echo $tab->active ? 'active' : ''; ?> list-tab">
-                            <a href="#" data-action="<?php echo $tab->action; ?>" data-module="<?php echo $tab->module; ?>" class="call-action" data-toggle="tab">
-                                <?php echo $tab->title; ?>
+                    foreach ($View->menu as $Tab): ?>
+                        <li class="<?php echo $Tab->active ? 'active' : ''; ?> list-Tab">
+                            <a href="#" data-action="<?php echo $Tab->action; ?>" data-module="<?php echo $Tab->module; ?>" class="call-action" data-toggle="Tab">
+                                <?php echo $Tab->title; ?>
                             </a>
                         </li>
                     <?php 
                     endforeach; ?>
                 </ul>                       
                 <div class="tab-content" style="overflow: visible">
-                    <div class="tab-pane active" id="main-panel"> 
+                    <div class="tab-pane active" id="main-panel">

@@ -4,12 +4,10 @@ class Tab {
     public $active = false;
     public $title;
     public $action;
-    public $module;
 
-    public function __construct($active, $title, $action = null, $module = null) {
-        $this->active = $active;
+    public function __construct($title, $action = null, $active = false) {
         $this->title  = $title;
-        $this->action = $action;
-        $this->module = $module;
+        $this->action = (empty($action) ? 'goHome' : $action);
+        $this->active = $active;
     }
 }

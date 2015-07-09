@@ -1,6 +1,13 @@
 <?php
 
-class User extends BaseModel {
+/**
+ * <h1>DAO do Usuário</h1>
+ * 
+ * @author Leandro Medeiros
+ * @since  2015-07-08
+ * @link   http://bitbucket.org/leandro_medeiros/monsterfymvc
+ */
+class User extends BaseDAO {
     //Status do usuário 
     const USR_INACTIVE   = -2;
     const USR_UNKNOW     = -1;
@@ -8,21 +15,24 @@ class User extends BaseModel {
     const USR_PW_INVALID = -3;
     const USR_TIMEOUT    = 55;
 
-    public $id = 0;
-    public $name;
-    public $email;
-    public $admin = false;
+    final public function __construct(UserDTO $Dto) {
+        parent::__construct($Dto);
+    }
 
     final static function login($user, $passwd) {   
         $passwd = md5($passwd);
-        $DB     = new Database();
+        $Script = new Script(new UserDTO());
+        $Script->table = 'user';
         
         try {
-            $DB->addArgument('user', $user);
-            $DB->addArgument('passwd', $passwd);
+            $Script->getSelect()
+                   ->where('email = :user')
+                   ->where('password = :passwd')
+                   ->addArgument('user', $user)
+                   ->addArgument('passwd', $passwd);
 
-            if ($DB->execute(Query::USER_GEY_BY_LOGIN))
-                return self::handleLoginResult($DB);
+            if ($Script->execute())
+                return self::handleLoginResult($Script);
             else
                 return self::USR_UNKNOW;
         }
@@ -30,19 +40,17 @@ class User extends BaseModel {
             self::logout($e->getMessage());
         }
     }
+    
+    final private static function handleLoginResult(Script $Script) {
+        $Dto = new UserDTO();
 
-    final private static function handleLoginResult(Database $DB) {
-        $DB->dataset = $DB->dataset[0];
+        Lib::datasetToDto($Dto, $Script->dataset[0]);
         
-        if (!isset($DB->dataset['id']) || $DB->dataset['id'] == '') {
+        if (empty($Dto->id)) {
             return self::USR_UNKNOW;
         }
 
-        $Logged = new User();
-        $Logged->id     = $DB->dataset['id'];
-        $Logged->name   = $DB->dataset['name'];
-        $Logged->email  = $DB->dataset['email'];
-        $Logged->admin  = $DB->dataset['admin'];
+        $Logged = new User($Dto);
 
         if (isset($_SESSION[BaseController::IDX_LAST_LOGGED]) &&
             ($Logged->id != $_SESSION[BaseController::IDX_LAST_LOGGED]))
@@ -79,6 +87,6 @@ class User extends BaseModel {
     }    
    
     public function __toString() {
-        return $this->name;
+        return $this->Dto->name;
     }
 }

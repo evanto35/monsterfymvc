@@ -9,7 +9,7 @@
 
         <meta name="author" content="Leandro Melão Medeiros" ref="http://about.me/leandro.medeiros">
         <meta name="title" content="Monsterfy MVC - PHP Framework" />
-        <meta name="version" content="<?php echo APP_VERSION; ?>" />
+        <meta name="version" content="<?php echo Config::APP_VERSION; ?>" />
         <meta name="package" content="Monsterfy MVC" ref="https://bitbucket.org/leandro_medeiros/monsterfymvc/">
         <meta name="keyword" content="Monsterfy, MVC, PHP, PHP Framework, Leandro Medeiros, Leandro Melão Medeiros" />
         <meta name="description" content="Monsterfy MVC é um Framework para PHP + MySQL desenvolvido por Leandro Medeiros desde 2012.
@@ -17,13 +17,13 @@
             Este software aberto e distribuído sob GPL 3." />
 
 
-        <title><?php echo APP_TITLE; if (isset($PageContent->title)) echo ' - ' . $PageContent->title; ?></title>
+        <title><?php echo $View->title; ?></title>
 
         <link rel="icon" type="image/png" href="<?php echo APP_REMOTE_PATH; ?>/assets/images/favicon.png">
 
-		<!-- jQuery -->
-		<script type="text/javascript" src="<?php echo APP_REMOTE_PATH; ?>/assets/js/jquery.min.js"></script>
-		
+        <!-- jQuery -->
+        <script type="text/javascript" src="<?php echo APP_REMOTE_PATH; ?>/assets/js/jquery.min.js"></script>
+
         <!-- Bootstrap core CSS -->
         <link href="<?php echo APP_REMOTE_PATH; ?>/assets/css/bootstrap.min.css" rel="stylesheet">
         <link href="<?php echo APP_REMOTE_PATH; ?>/assets/css/bootstrap-theme.min.css" rel="stylesheet">
@@ -33,14 +33,14 @@
         <!-- Monsterfy CSS -->
         <link type="text/css" href="<?php echo APP_REMOTE_PATH; ?>/assets/css/monsterfy.css" rel="stylesheet">
 
-		<!-- DataTables CSS -->
-		<link rel="stylesheet" type="text/css" href="<?php echo APP_REMOTE_PATH; ?>/plugins/DataTables/media/css/jquery.dataTables.css">
-		  
-		<!-- jQuery ->
-		<script type="text/javascript" charset="utf8" src="<?php echo APP_REMOTE_PATH; ?>/plugins/DataTables/media/js/jquery.js"></script-->
-		  
-		<!-- DataTables -->
-		<script type="text/javascript" charset="utf8" src="<?php echo APP_REMOTE_PATH; ?>/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+        <!-- DataTables CSS -->
+        <link rel="stylesheet" type="text/css" href="<?php echo APP_REMOTE_PATH; ?>/plugins/DataTables/media/css/jquery.dataTables.css">
+
+        <!-- jQuery ->
+        <script type="text/javascript" charset="utf8" src="<?php echo APP_REMOTE_PATH; ?>/plugins/DataTables/media/js/jquery.js"></script-->
+
+        <!-- DataTables -->
+        <script type="text/javascript" charset="utf8" src="<?php echo APP_REMOTE_PATH; ?>/plugins/DataTables/media/js/jquery.dataTables.js"></script>
     </head>
 
 	<body>
@@ -58,8 +58,8 @@
                     </button>
 
                     <!-- Be sure to leave the brand out there if you want it shown -->
-                    <a class="navbar-brand" title="Página inicial">
-                        <?php echo APP_TITLE; ?>
+                    <a href="./" class="navbar-brand" title="Página inicial">
+                        <?php echo Config::APP_TITLE; ?>
                         <!--img src="<?php echo APP_REMOTE_PATH; ?>/assets/images/logo.png" width="156" height="40" alt="" /-->
                     </a>
                 </div>
@@ -67,9 +67,9 @@
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse">                
                     <ul class="nav navbar-nav">
-                        <?php foreach ($PageContent->navigator as $Module): ?>
-                            <li class="<?php echo $Module->active ? 'active' : '';  ?>" >    
-                                <a href="../<?php echo strtolower($Module->controller); ?>"><?php echo $Module->title; ?></a>
+                        <?php foreach ($View->navigator as $Dto): ?>
+                            <li class="<?php echo $Dto->name == $View->module ? 'active' : '';  ?>" >    
+                                <a href="../<?php echo strtolower($Dto->name); ?>"><?php echo $Dto->title; ?></a>
                             </li>
                         <?php endforeach; ?>
                     </ul>
@@ -79,7 +79,7 @@
                             <a title="Minha conta" href="#account-modal" role="button" data-toggle="modal" 
                                class="navbar-link pull-right">
                                 <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-                                <?php echo $PageContent->CurrentUser; ?>
+                                <?php echo $View->CurrentUser; ?>
                             </a>
                         </li>
                         <li>

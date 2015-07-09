@@ -76,4 +76,12 @@ class Lib {
     public static function printAndDie($info) {
 		die("<pre>" . print_r($info, true) . "</pre>");
     }
+
+    public static function datasetToDto(BaseDTO $Target, $source) {
+        foreach($source as $property => $value) {
+            $Target->$property = $value;
+        }
+
+        return $Target;
+    }
 }

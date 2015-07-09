@@ -50,25 +50,25 @@ class Alert {
     const MSG_CALL_INVALID         = 'Falha ao concluir atendimento, ID não informado.';
 
     /**
-     * @var integer
+     * @property integer
      * identificador do alerta
      */
     public $id;
 
     /**
-     * @var string
+     * @property string
      * mensagem que será exibida no alerta
      */
     public $text;
 
     /**
-     * @var string
+     * @property string
      * tipo do alerta (erro, sucesso, info...)
      */
     public $type;
 
     /**
-     * @var boolean
+     * @property boolean
      * flag utilizada para saber se o ícone para fechar o alerta será exibido ou não
      */
     public $showIcon;

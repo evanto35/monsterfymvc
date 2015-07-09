@@ -3,19 +3,14 @@
     session_start();
 
     /* Diretórios */
-    define("APP_LOCAL_PATH", dirname(__FILE__));
-    define("APP_REMOTE_PATH", $_SERVER['HTTP_ROOT']);
+    define('APP_LOCAL_PATH', dirname(__FILE__));
+    define('APP_LOCAL_PATH', dirname(__FILE__) + '/assets/images/');
+    define('APP_REMOTE_PATH', '../..');
 
-    /* Dados da Aplicação */
-    define("APP_TITLE", "Monsterfy MVC");
-    define("APP_VERSION", "2.1");
-    
     /* Fuso-horário */
     date_default_timezone_set('America/Sao_Paulo');
 
-    /* Configurações */
-    //require_once(APP_ROOT . "/config/Config.php");
-
+    /* Loader */
     function loadMonsterfy($classe) {
         $path   = array();
         $path[] = 'commons';
@@ -23,7 +18,7 @@
         $path[] = 'models';
 
         foreach ($path as $subdir) {
-            $arquivo = APP_ROOT . "/$subdir/$classe.php";
+            $arquivo = APP_LOCAL_PATH . "/$subdir/$classe.php";
             
             if (file_exists($arquivo)) {
                 require_once($arquivo);

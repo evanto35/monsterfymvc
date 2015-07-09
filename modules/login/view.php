@@ -14,7 +14,7 @@
             Foi pensado para aplicações de pequeno à médio porte. Por padrão o Front-end é criado com o Twitter Bootstrap, porém é possível de forma muito fácil migrar para outro framework Web.
             Este software aberto e distribuído sob GPL 3." />
 
-        <title><?php echo APP_TITLE; ?> - Login</title>
+        <title><?php echo Config::APP_TITLE; ?> - Login</title>
 
         <link rel="icon" type="image/png" href="<?php echo APP_REMOTE_PATH; ?>/assets/images/favicon.png">
 
@@ -34,7 +34,7 @@
     <body>
         <section id="headline2">
             <div class="container">
-                <h1 id="title"><?php echo APP_TITLE; ?></h1>
+                <h1 id="title"><?php echo Config::APP_TITLE; ?></h1>
             </div>
         </section>
 
