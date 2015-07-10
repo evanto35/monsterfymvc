@@ -1,28 +1,26 @@
-# MonsterfyMVC Framework #
+# MonsterfyMVC #
+***Framework para PHP + MySQL***
 
-Copyright (C)2012
+Copyright (C) 2012
+
 http://bitbucket.org/leandro_medeiros/monsterfymvc
 
-
-### SOBRE ###
-MonsterfyMVC é um projeto sem fins lucrativos idealizado e mantido por [Leandro Medeiros](http://about.me/leandro.medeiros).
+### Sobre ###
+***MonsterfyMVC*** é um projeto sem fins lucrativos idealizado e mantido por [Leandro Medeiros](http://about.me/leandro.medeiros).
 
 Este framework permite o desenvolvimento do back-end de aplicações WEB baseado na arquitetura Model-View-Controller. As classes-base aqui disponibilizadas controlam a comunicação com a base de dados (DAOs e DTOs) e o fluxo do sistema (Controllers e Views).
 
-
-### LICENÇA ###
-Este software é gratuito e distribuído sob a GPLv3. Veja <licence/gpl.txt> OU
+### Licença ###
+Este software é gratuito e distribuído sob a ***GPLv3***. Veja <licence/gpl.txt> OU
 [GNU Org](http://www.gnu.org/licenses/) para maiores informações.
 
-
-### ADD-ONS ###
-Junto ao Monsterfy são distribuídas cópias de softwares complementares:
+### Add-ons ###
+Junto ao *Monsterfy* são distribuídas cópias de softwares complementares:
 
 - O front-end é construído sobre o [framework Bootstrap](http://getbootstrap.com).
 - As grades são reprocessadas pelo [plugin DataTables](http://datatables.net).
 
-
-### PRÉ-REQUISITOS ###
+### Pré-requisitos ###
 Ambiente de desenvolvimento:
 
 1. [MySQL Server 5.0+](http://dev.mysql.com/downloads/). (Pode-se rodar o MySQL em qualquer outro
@@ -33,11 +31,10 @@ computador, desde que o usuário tenha permissões remotas);
 Obs.: Desenvolvedores iniciantes ou preguiçosos podem usar uma SolutionStack como o MAMP (Mac OS X),
 WAMP (MS Windows) ou LAMP (OS baseado em Linux).
 
-
-### INSTALAÇÃO ###
+### Instalação ###
 Após a configuração do ambiente de desenvolvimento a instalação do framework é bastante simples:
 
-1. Copiar a pasta completa do MonsterfyMVC para o diretório ROOT configurado no seu servidor HTTP;
+1. Copiar a pasta completa do *MonsterfyMVC* para o diretório ROOT configurado no seu servidor HTTP;
 2. Executar o script <documentation/mysql/scripts/01-create.sql> (renomeie o banco de dados à vontade);
 3. Alterar as constantes da classe Config <commons/Config.php> com os dados de acesso ao seu servidor
 MySQL (host, porta, nome do banco, usuário e senha);
