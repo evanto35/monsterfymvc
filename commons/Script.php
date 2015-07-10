@@ -1,14 +1,33 @@
 <?php
+#############################################################################
+##   MonsterfyMVC - MVC Framework for PHP + MySQL                          ##
+##   Copyright (C) 2012  Leandro Medeiros                                  ##
+##                                                                         ##
+##   This program is free software: you can redistribute it and/or modify  ##
+##   it under the terms of the GNU General Public License as published by  ##
+##   the Free Software Foundation, either version 3 of the License, or     ##
+##   (at your option) any later version.                                   ##
+##                                                                         ##
+##   This program is distributed in the hope that it will be useful,       ##
+##   but WITHOUT ANY WARRANTY; without even the implied warranty of        ##
+##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         ##
+##   GNU General Public License for more details.                          ##
+##                                                                         ##
+##   You should have received a copy of the GNU General Public License     ##
+##   along with this program.  If not, see <http://www.gnu.org/licenses/>. ##
+##                                                                         ##
+#############################################################################
 
 /**
  * <h1>Classe Script</h1>
  * 
  * <p>Classe para executar scripts no banco de dados
  * baseado na estrutura de um DTO.</p>
- * 
- * @author Leandro Medeiros
- * @since  2015-07-08
- * @link   http://bitbucket.org/leandro_medeiros/monsterfymvc
+ *
+ * @package commons
+ * @author  Leandro Medeiros
+ * @since   2015-07-08
+ * @link    http://bitbucket.org/leandro_medeiros/monsterfymvc
  */
 final class Script {
     /**
@@ -230,8 +249,8 @@ final class Script {
      * <p>Adiciona um argumento aos parâmetros do script.</p>
      *
      * @method addArgument
-     * @param  string   Nome do argumento
-     * @param  mixed    Valor do argumetno
+     * @param  string $argument Nome do argumento
+     * @param  mixed  $value	Valor do argumetno
      * @author Leandro Medeiros
      * @since  2015-07-09
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
@@ -252,7 +271,7 @@ final class Script {
      * <p>Define os argumentos do script a partir de um DTO.</p>
      *
      * @method setArguments
-     * @param  BaseDTO
+     * @param  BaseDTO $Dto DTO preenchido
      * @return Script própria instância
      * @author Leandro Medeiros
      * @since  2015-07-08
@@ -272,7 +291,7 @@ final class Script {
      * <h1>Executar Script</h1>
      *
      * @method execute
-     * @param  boolean Manter Argumentos após execução do script
+     * @param  boolean $keepArguments Manter Argumentos após execução do script
      * @return boolean Sucesso
      * @author Leandro Medeiros
      * @since  2015-07-09
