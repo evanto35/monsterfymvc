@@ -27,7 +27,6 @@
         <link href="<?php echo APP_REMOTE_PATH; ?>/assets/css/bootstrap-theme.css.map">
         <script src="<?php echo APP_REMOTE_PATH; ?>/assets/js/bootstrap.min.js"></script>
           
-        <!-- Custom styles for this template -->
         <link href="<?php echo APP_REMOTE_PATH; ?>/assets/css/login.css" rel="stylesheet">
     </head>
 

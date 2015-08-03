@@ -54,6 +54,12 @@ final class View {
     private $module;
 
     /**
+     * Aba Atual
+     * @var integer
+     */
+    public $tab = 1;
+
+    /**
      * Itens da barra de navegação
      * @var array
      */
@@ -98,10 +104,13 @@ final class View {
      * @since  2015-07-09
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
      */
-    public function __construct($module) {
+    public function __construct(ModuleDTO $Module) {
         $this->CurrentUser = User::getLogged();
-        $this->System      = System::get();
-        $this->module      = $module;
+        $this->System      = System::getStored();
+        $this->module      = $Module->name;
+        $this->menu        = isset($this->System->tabs[$Module->id]) ? $this->System->tabs[$Module->id] : array();
+
+        $this->setTitle($Module->title);
     }
 
     /**
@@ -121,25 +130,23 @@ final class View {
      * <h1>Carregar Página</h1>
      *
      * @method load
-     * @param  boolean $headerContent Carregar conteúdo do cabeçalho
-     * @return void
+     * @param  boolean $jsonResponse Retornar JSON
+     * @return null
      * @author Leandro Medeiros
      * @since  2015-07-09
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
      */
-    public function load($headerContent = true) {
-        if (Config::JSON_RESPONSE) {
+    public function load($data = null, $jsonResponse = false) {
+        if (!empty($data)) {
+            $this->data = $data;
+        }
+        if ($jsonResponse || Config::JSON_RESPONSE) {
             BaseController::clearLastArgs();
             echo json_encode($this);
         }
         else {
-            $View = $this;
-
             require("modules/header.php");
-            if ($headerContent) {
-                require("modules/header-content.php");
-            }
-            require("modules/{$View->module}/view.php");
+            require("modules/{$this->module}/content.php");
             require("modules/footer.php");
         }
     }
@@ -154,18 +161,5 @@ final class View {
      */
     public function setNavigator($navigator) {
         $this->navigator = $navigator;
-    }
-
-    /**
-     * <h1>Adicionar Aba</h1>
-     *
-     * @method addTab
-     * @param  Tab $Tab Nova Aba
-     * @author Leandro Medeiros
-     * @since  2015-07-09
-     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
-     */
-    public function addTab(Tab $Tab) {
-        $this->menu[] = $Tab;
     }
 }

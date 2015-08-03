@@ -39,6 +39,8 @@ class Alert {
     const MSG_SYSTEM_CONNECTION_OUT  = 'Erro de conexão ao servidor. Tente novamente dentro de instantes';
     const MSG_SYSTEM_METHOD_FAIL     = 'Falha ao processar requisição: O método <strong>%s->%s</strong> não existe.';
 
+    const MSG_DB_CONNECTION_FAIL     = 'Falha de conexão ao banco de dados: "%s".';
+
     /**
      * Constantes referentes aos alertas relacionados ao login
      */
@@ -57,13 +59,9 @@ class Alert {
     const MSG_USER_INVALID_TYPE     = 'Tipo de usuário inválido.';
 
     /**
-     * Mensagens sobre Ligações
+     * Mensagens sobre Módulos
      */
-    const MSG_CALL_REGISTERED      = 'Ligação registrada com sucesso!';
-    const MSG_CALL_REGISTERED_FAIL = 'Falha ao registrar ligação';
-    const MSG_CALL_FINISHED        = 'Fim de ligação registrada com sucesso!';
-    const MSG_CALL_INVALID         = 'Falha ao concluir atendimento, ID não informado.';
-
+    const MSG_MODULE_ACCESS_DENIED  = 'Você não possui os privilégios necessários para acessar este módulo';
     /**
      * @property integer
      * identificador do alerta

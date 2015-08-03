@@ -27,7 +27,7 @@
  * @since  2015-07-08
  * @link   http://bitbucket.org/leandro_medeiros/monsterfymvc
  */
-abstract class BaseDTO {
+class BaseDTO {
     /**
      * Chave primária
      * @var integer

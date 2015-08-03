@@ -95,7 +95,7 @@ final class Script {
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
      */
 	public function getSelect() {
-		$this->sql = "SELECT " . implode(', ', $this->fields) . " FROM {$this->table} ";
+		$this->sql = "SELECT `" . implode('`, `', $this->fields) . "` FROM {$this->table} ";
 
 		return $this;
 	}
@@ -118,7 +118,14 @@ final class Script {
         }
 
         if (!empty($conditions)) {
-            $this->sql .= " ({$conditions}) ";
+            if (is_array($conditions)) {
+                foreach ($conditions as $field => $value) {
+                    $this->sql .= " {$link} ({`$field`} = {$value} ";
+                }
+            }
+            else {
+                $this->sql .= " ({$conditions}) ";
+            }
         }
         else if (!empty($this->{$this->primaryKey})) {
             $this->sql .= " (({$this->table}.{$this->primaryKey} = :id) AND {$this->table}.active) ";
@@ -173,7 +180,7 @@ final class Script {
      */
     public function getUpdate() {
 		$this->sql = "UPDATE {$this->table}
-				         SET (" . implode(', ', $this->fields) . " )
+				         SET ({implode(', ', $this->fields)})
 				       WHERE {$this->table}.{$this->primaryKey} = :id ";
         return $this;
 	}

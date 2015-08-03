@@ -1,26 +1,25 @@
-                        </div> <!-- /.tab-pane -->
 
-                    </div>  <!-- /.tab-content -->
+                            </div> <!-- /.tab-pane -->
 
-                </div> <!-- /.tabbable -->
+                        </div>  <!-- /.tab-content -->
 
-            </div> <!-- /.span10 -->
+                    </div> <!-- /.tabbable -->
 
-        </div> <!-- /.row-fluid -->
+                </div> <!-- /.span10 -->
 
-        <hr>
+            </div> <!-- /.row-fluid -->
 
-        <div>
-            <?php BaseController::debuggingEcho(); ?>
-        </div>
+            <hr>
 
-        <footer id="footer-fluid">            
-            <p class="pull-right">Monsterfy &copy;<?php echo date('Y'); ?></p>
-        </footer>
+            <div>
+                <?php BaseController::debuggingEcho(); ?>
+            </div>
+
+            <footer id="footer-fluid">            
+                <p class="pull-right">Monsterfy &copy;2012-<?php echo date('Y'); ?></p>
+            </footer>
 
         </div> <!-- /.container-fluid --> 
     </body>
 </html>
-<?php 
-    ob_end_flush();
-?>
+<?php ob_end_flush(); ?>

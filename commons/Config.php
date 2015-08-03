@@ -95,6 +95,21 @@ abstract class Config {
      */
     const CONNECTION_STRING = '%s:host=%s;dbname=%s;charset=utf8;port=%d';
 
+    /* Últimos parâmetros */
+    const IDX_LAST_ARGS = 'idx_00';
+
+    /* Usuário Logado */
+    const IDX_LOGGED = 'idx_01';
+
+    /* ID do último usuário logado */
+    const IDX_LAST_LOGGED = 'idx_02';
+
+    /* Instância do System */
+    const IDX_SYSTEM = 'idx_03';
+
+    /* Variáveis para depuração */
+    const IDX_DEBUGGING = 'idx_04';
+
     /**
      * <h1>Obter String de Conexão</h1>
      *

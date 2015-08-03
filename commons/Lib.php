@@ -37,10 +37,22 @@ class Lib {
 	    return $needle === "" || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== FALSE);
 	}
 
+    function mkdir_r($dirName, $rights=0777){
+        $dirs = explode('/', $dirName);
+        $dir  = '';
+
+        foreach ($dirs as $part) {
+            $dir .= $part . '/';
+            if (!is_dir($dir) && strlen($dir) > 0)
+                mkdir($dir, $rights);
+        }
+    }    
+
 	public function log($data) {
 	    $path = APP_LOCAL_PATH . '/log/';
 	    
-	    if (!is_dir($path)) mkdir($path, 0777, true);
+        if (!is_dir($path)) mkdir($path, 0777);
+	    // if (!is_dir($path)) Lib::mkdir_r($path, 0755);
 
 	    $filename = $path . date('Y-m-d') . '.log';
 	    $fp = @fopen($filename, "a+");
@@ -50,11 +62,11 @@ class Lib {
 		        $data = print_r($data, true);
 		    }
 
-		    $str      = "\r\n//\r\n";
+		    $str      = "\r\n###########################################################################################################\r\n";
 		    $str     .= "Log registrado às " . date("H:i:s") . "\r\n";
 		    $str     .= "Navegador: " . $_SERVER['HTTP_USER_AGENT'] . "\r\n";
 		    $str     .= "IP: " . $_SERVER['REMOTE_ADDR'];
-		    $str 	 .= "\r\nRegistro: " . $data .  "\r\n//\r\n";
+		    $str 	 .= "\r\n" . $data . "\r\n###########################################################################################################\r\n";
 
 		    @fputs($fp, $str);
 		    fclose($fp);

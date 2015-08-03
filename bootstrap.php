@@ -33,7 +33,8 @@
         $path   = array();
         $path[] = 'commons';
         $path[] = 'controllers';
-        $path[] = 'models';
+        $path[] = 'models/dao';
+        $path[] = 'models/dto';
 
         foreach ($path as $subdir) {
             $arquivo = APP_LOCAL_PATH . "/$subdir/$classe.php";

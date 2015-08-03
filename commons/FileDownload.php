@@ -68,7 +68,7 @@ class FileDownload {
 	 *
 	 * @method saveToFile
 	 * @param  string $path Diretório
-	 * @return void
+	 * @return null
 	 * @author Leandro Medeiros
 	 * @since  2015-07-09
 	 * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc

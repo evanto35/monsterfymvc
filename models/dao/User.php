@@ -47,6 +47,7 @@ class User extends BaseDAO {
             $Script->getSelect()
                    ->where('email = :user')
                    ->where('password = :passwd')
+                   ->where('active')
                    ->addArgument('user', $user)
                    ->addArgument('passwd', $passwd);
 
@@ -71,8 +72,8 @@ class User extends BaseDAO {
 
         $Logged = new User($Dto);
 
-        if (isset($_SESSION[BaseController::IDX_LAST_LOGGED]) &&
-            ($Logged->id != $_SESSION[BaseController::IDX_LAST_LOGGED]))
+        if (isset($_SESSION[Config::IDX_LAST_LOGGED]) &&
+            ($Logged->id != $_SESSION[Config::IDX_LAST_LOGGED]))
         {
             session_unset();
         }
@@ -91,18 +92,18 @@ class User extends BaseDAO {
     }
 
     final static function setLogged(User $User) {
-        $_SESSION[BaseController::IDX_LAST_LOGGED] = $User->id;
-        $_SESSION[BaseController::IDX_LOGGED] = serialize($User);
+        $_SESSION[Config::IDX_LAST_LOGGED] = $User->id;
+        $_SESSION[Config::IDX_LOGGED] = serialize($User);
     }
 
     final static function hasLogged() {
-        return isset($_SESSION[BaseController::IDX_LOGGED]);
+        return isset($_SESSION[Config::IDX_LOGGED]);
     }	
 
     final static function getLogged() {
         if (!self::hasLogged()) return false;
         
-        return unserialize($_SESSION[BaseController::IDX_LOGGED]);
+        return unserialize($_SESSION[Config::IDX_LOGGED]);
     }    
    
     public function __toString() {

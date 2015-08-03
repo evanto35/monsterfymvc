@@ -18,14 +18,38 @@
 ##                                                                         ##
 #############################################################################
 
-class Tab {
-    public $active = false;
-    public $title;
-    public $action;
+/**
+ * <h1>DAO do Módulo</h1>
+ *
+ * @package models
+ * @author  Leandro Medeiros
+ * @since   2015-07-08
+ * @link    http://bitbucket.org/leandro_medeiros/monsterfymvc 
+ */
+class Module extends BaseDAO {
+    /**
+     * <h1>Construtor</h1>
+     *
+     * @method __construct
+     * @param  ModuleDTO $Dto
+     * @author Leandro Medeiros
+     * @since  2015-07-09
+     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     */
+    public function __construct(ModuleDTO $Dto) {
+        parent::__construct($Dto);
+    }
 
-    public function __construct($title, $action = null, $active = false) {
-        $this->title  = $title;
-        $this->action = (empty($action) ? 'goHome' : $action);
-        $this->active = $active;
+    /**
+     * <h1>Obter Lista (override)</h1>
+     *
+     * @method getList
+     * @return array Lista
+     * @author Leandro Medeiros
+     * @since  2015-07-09
+     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     */
+    public static function getList() {
+    	return parent::getList(new ModuleDTO, '', 'menu_order');
     }
 }

@@ -42,37 +42,22 @@ abstract class BaseController {
     protected $System;
 
     /**
-     * Módulo correspondente à Controller (nome da pasta da View)
-     * @var string
+     * Instância da View correspondente
+     * @var View
      */
-    public static $module = Config::DEFAULT_MODULE;
+    protected $View;
 
     /**
-     * Título da View
+     * Id do módulo correspondente à Controller
      * @var string
      */
-    protected static $title = 'Dashboard';
+    public static $moduleId = 0;
 
     /**
      * Exibir Navegador
      * @var boolean
      */
     protected static $showNavigator = true;
-
-    /* Últimos parâmetros */
-    const IDX_LAST_ARGS = 'idx_00';
-
-    /* Usuário Logado */
-    const IDX_LOGGED = 'idx_01';
-
-    /* ID do último usuário logado */
-    const IDX_LAST_LOGGED = 'idx_02';
-
-    /* Instância do System */
-    const IDX_SYSTEM = 'idx_03';
-
-    /* Variáveis para depuração */
-    const IDX_DEBUGGING = 'idx_04';
 
     /**
      * <h1>Construtor</h1>
@@ -81,7 +66,7 @@ abstract class BaseController {
      * caso contrário processa a requisição.</p>
      *
      * @method __construct
-     * @return void
+     * @return null
      * @see    /commons/BaseController/handleRequest
      * @see    /commons/BaseController/handleLoginRequest
      * @author Leandro Medeiros
@@ -98,7 +83,15 @@ abstract class BaseController {
         }
         else {
             $this->CurrentUser = User::getLogged();
-            $this->action($arguments);
+            $this->System      = System::getStored();
+
+            if ($this->setView()) {
+                $this->action($arguments);
+            }
+            else {
+                new Alert(Alert::MSG_MODULE_ACCESS_DENIED, Alert::ERROR);
+                header('Location:../');                
+            }
         }
     }
 
@@ -118,15 +111,15 @@ abstract class BaseController {
      */
     private function getRequest() {
         if (!empty($_POST)) {
-            $_SESSION[self::IDX_LAST_ARGS] = serialize($_POST);
+            $_SESSION[Config::IDX_LAST_ARGS] = serialize($_POST);
             unset($_POST);
         }
         else if (!empty($_GET)) {
-            $_SESSION[self::IDX_LAST_ARGS] = serialize($_GET);
+            $_SESSION[Config::IDX_LAST_ARGS] = serialize($_GET);
             unset($_GET);
         }
         else if (!empty($_REQUEST)) {
-            $_SESSION[self::IDX_LAST_ARGS] = serialize($_REQUEST);
+            $_SESSION[Config::IDX_LAST_ARGS] = serialize($_REQUEST);
             unset($_REQUEST);
         }
 
@@ -143,7 +136,7 @@ abstract class BaseController {
      * @link   http://bitbucket.org/leandro_medeiros/monsterfymvc
      */
     protected static function getLastArgs() {
-        return isset($_SESSION[self::IDX_LAST_ARGS]) ? unserialize($_SESSION[self::IDX_LAST_ARGS]) : array();
+        return isset($_SESSION[Config::IDX_LAST_ARGS]) ? unserialize($_SESSION[Config::IDX_LAST_ARGS]) : array();
     }
     
     /**
@@ -152,13 +145,13 @@ abstract class BaseController {
      * <p>Limpa o histórico de requisicões.</p>
      *
      * @method clearLastArgs
-     * @return void
+     * @return null
      * @author Leandro Medeiros
      * @since  2015-07-09
      * @link   http://bitbucket.org/leandro_medeiros/monsterfymvc
      */
     protected static function clearLastArgs() {
-        unset($_SESSION[self::IDX_LAST_ARGS]);
+        unset($_SESSION[Config::IDX_LAST_ARGS]);
     }
 
     final protected function refreshLoggedUser() {
@@ -166,27 +159,14 @@ abstract class BaseController {
     }
 
     /**
-     * <h1>Configurar Abas</h1>
-     * <p>Toda classe filha deve implementar este método para
-     * define as abas que serão exibidas dentro do módulo.</p>
-     *
-     * @method setTabs
-     * @param  View $View por referência
-     * @return View view atualizada
-     * @author Leandro Medeiros
-     * @since  2015-07-09
-     * @link   http://bitbucket.org/leandro_medeiros/monsterfymvc
-     */
-    abstract protected function setTabs(View &$View);   
-
-    /**
      * <h1>Exibir Home Page</h1>
      *
-     * <p>Toda classe filha deve implementar este método para preencher um objeto View
-     * e exibí-lo (View->load()).</p>
+     * <p>Toda classe filha deve implementar este método para preencher um objeto
+     * <code>View</code> e exibí-lo.</p>
      * 
      * @method goHome
-     * @return void
+     * @return null
+     * @see /commons/View/load
      * @author Leandro Medeiros
      * @since  2015-07-09
      * @link   http://bitbucket.org/leandro_medeiros/monsterfymvc
@@ -201,7 +181,7 @@ abstract class BaseController {
      *
      * @method action
      * @param  array $arguments Argumentos para o método
-     * @return void
+     * @return null
      * @author Leandro Medeiros
      * @since  2015-07-09
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
@@ -238,22 +218,26 @@ abstract class BaseController {
      * <h1>Obter View</h1>
      *
      * @method getView
-     * @param  mixed $viewData Dados para a View
      * @return View objeto view parametrizado de acordo com instância da Controller
      * @author Leandro Medeiros
      * @since  2015-07-09
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
      */
-    protected function getView($viewData) {
-        $View = new View(static::$module);
-        $View->setTitle(static::$title);
-        $View->data = $viewData;
+    protected function setView() {
+        $Module = $this->System->userModules[static::$moduleId];
 
-        if (static::$showNavigator) {
-            $View->setNavigator(Module::getList());
+        if (!$Module instanceof ModuleDTO) {
+            return false;
         }
+        else {
+            $this->View = new View($Module);
 
-        return $View;
+            if (static::$showNavigator) {
+                $this->View->setNavigator($this->System->userModules);
+            }
+
+            return true;
+        }
     }
 
     /**
@@ -261,15 +245,15 @@ abstract class BaseController {
      *
      * @method loadLogin
      * @param  string $message Alerta (opcional)
-     * @return void
+     * @return null
      * @author Leandro Medeiros
      * @since  2015-07-09
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
      */
     private static function loadLogin($message = null) {
-        $View = new View('login', 'Login', $message);
+        unset($_SESSION[Config::IDX_SYSTEM]);
 
-        require('modules/login/view.php');
+        require('modules/login/content.php');
     }
 
     /**
@@ -280,7 +264,7 @@ abstract class BaseController {
      * 
      * @method login
      * @param  array $args Parâmetros do login
-     * @return void
+     * @return null
      * @author Leandro Medeiros
      * @since  2015-07-09
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
@@ -299,8 +283,7 @@ abstract class BaseController {
 
             switch ($status) {
                 case User::USR_LOGGED:
-                    $this->CurrentUser= User::getLogged();
-                    $this->goHome();
+                    header('Location:./');
                 break;
                 
                 case User::USR_INACTIVE:
@@ -333,7 +316,7 @@ abstract class BaseController {
      * <p>Finaliza a sesão do usuário e exibe a tela de login.</p>
      *
      * @method logout
-     * @return void
+     * @return null
      * @author Leandro Medeiros
      * @since  2015-07-09
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
@@ -356,7 +339,7 @@ abstract class BaseController {
      * @link   http://bitbucket.org/leandro_medeiros/monsterfymvc
      */
     protected static function debuggingAdd($data) {
-        $_SESSION[self::IDX_DEBUGGING][] = $data;
+        $_SESSION[Config::IDX_DEBUGGING][] = $data;
     }
 
     /**
@@ -371,12 +354,12 @@ abstract class BaseController {
      * @link   http://bitbucket.org/leandro_medeiros/monsterfymvc
      */
     public static function debuggingEcho() {
-        if (isset($_SESSION[self::IDX_DEBUGGING])) {
+        if (isset($_SESSION[Config::IDX_DEBUGGING])) {
             echo '<pre>';
-            print_r($_SESSION[self::IDX_DEBUGGING]);
+            print_r($_SESSION[Config::IDX_DEBUGGING]);
             echo '</pre>';
             
-            unset($_SESSION[self::IDX_DEBUGGING]);
+            unset($_SESSION[Config::IDX_DEBUGGING]);
         }
     }    
 }

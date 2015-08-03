@@ -34,6 +34,13 @@ class DashboardController extends BaseController {
     protected static $showNavigator = false;
 
     /**
+     * Id do módulo correspondente à Controller
+     * @var string
+     */
+    public static $moduleId = 2;
+
+
+    /**
      * <h1>Exibir HomePage (override)</h1>
      *
      * @method goHome
@@ -44,22 +51,6 @@ class DashboardController extends BaseController {
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
      */
 	public function goHome($forceRefresh = false) {
-        return $this->setTabs($this->getView(Module::getList()))->load();
-    }
-
-    /**
-     * <h1>Configurar Abas</h1>
-     *
-     * @method setTabs
-     * @param  View $View por referência
-     * @return View view atualizada
-     * @author Leandro Medeiros
-     * @since  2015-07-09
-     * @link   http://bitbucket.org/leandro_medeiros/monsterfymvc
-     */
-    public function setTabs(View &$View) {
-        $View->addTab(new Tab('Módulos', 'goHome', true));
-
-        return $View;
+        return $this->View->load($this->System->userModules);
     }
 }

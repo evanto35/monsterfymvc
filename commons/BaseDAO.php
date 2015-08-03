@@ -55,15 +55,22 @@ abstract class BaseDAO {
      *
      * @method __construct
      * @param  BaseDTO $Dto Instância de DTO para configurar o DAO
-     * @return void
+     * @return null
      * @author Leandro Medeiros
      * @since  2015-07-09
      * @link   http://bitbucket.org/leandro_medeiros/monsterfymvc
      */
-    public function __construct(BaseDTO $Dto) {
+    public function __construct(BaseDTO $Dto, $tableName = '') {
         $this->instanceClass   = get_class($this);
         $this->Script          = new Script($Dto);
-        $this->Script->table   = strtolower($this->instanceClass);
+
+        if (empty($tableName)) {
+            $this->Script->table = strtolower($this->instanceClass);
+        }
+        else {
+            $this->Script->table = $tableName;
+        }
+
         $this->setDto($Dto);
 
         if (!$this instanceof User) {
@@ -109,6 +116,16 @@ abstract class BaseDAO {
         }
 
         return $this;
+    }
+
+    public function __get($property) {
+        if (property_exists($this->instanceClass, $property)) {
+            return $this->$property;
+        }
+
+        else if (property_exists(get_class($this->Dto), $property)) {
+            return $this->Dto->$property;
+        }
     }
 
     /**
@@ -204,7 +221,8 @@ abstract class BaseDAO {
 
         else if (!empty($this->Dto->id)) {
             $resetDto = true;
-            $this->Script->where()->limit(1);
+            $this->Script->where()
+                         ->limit(1);
         }
 
         else {
@@ -232,15 +250,22 @@ abstract class BaseDAO {
      * @since  2015-07-09
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
      */
-    public static function getList(BaseDTO $Dto, $conditions = '') {
+    public static function getList(BaseDTO $Dto, $conditions = '', $order = '', $resultIndex = 'id') {
         $dtoClass      = get_class($Dto);
         $Script        = new Script($Dto);
         $Script->table = strtolower(preg_replace('/DTO$/', '', $dtoClass));
         $list          = array();
         
-        if ($Script->getSelect()->where($conditions)->execute()) {
+        if ($Script->getSelect()->where($conditions)->order($order)->execute()) {
             foreach($Script->dataset as $element) {
-                $list[] = Lib::datasetToDto(new $dtoClass(), $element);
+                $idx = $element[$resultIndex];
+
+                if ($resultIndex != 'id') {
+                    $list[$idx][] = Lib::datasetToDto(new $dtoClass(), $element);
+                }
+                else {
+                    $list[$idx] = Lib::datasetToDto(new $dtoClass(), $element);
+                }
             }
         }
 

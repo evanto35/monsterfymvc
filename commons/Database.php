@@ -48,10 +48,21 @@ final class Database {
      */
     private static function getConnection() {
         if (!static::$connection) {
-            static::$connection = new PDO(Config::getConnectionString(),
-                                          Config::DB_USER,
-                                          Config::DB_PASSWORD,
-                                          array(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION));
+            try {
+                static::$connection = new PDO(Config::getConnectionString(),
+                                              Config::DB_USER,
+                                              Config::DB_PASSWORD,
+                                              array(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION));
+            }
+            catch (PDOException $e) {
+                static::$connection = null;
+
+                Lib::log($e->getCode() . ": " . $e->getMessage());
+
+                new Alert(sprintf(Alert::MSG_DB_CONNECTION_FAIL, $e->getMessage()), Alert::ERROR);
+
+                throw $e;
+            }
         }
 
         return static::$connection;
