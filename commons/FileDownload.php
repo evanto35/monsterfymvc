@@ -19,7 +19,7 @@
 #############################################################################
 
 /**
- * <h1>Baixar Arquivo</h1>
+ * Baixar Arquivo
  * 
  * <p>Responsável por fazer o download de um arquivo via PHP.</p>
  *
@@ -48,7 +48,7 @@ class FileDownload {
 	private $content;
 
 	/**
-	 * <h1>Construtor</h1>
+	 * Construtor
 	 *
 	 * @method __construct
 	 * @param  string $name    Nome do Arquivo
@@ -64,7 +64,7 @@ class FileDownload {
 	}
 
 	/**
-	 * <h1>Salvar em Arquivo</h1>
+	 * Salvar em Arquivo
 	 *
 	 * @method saveToFile
 	 * @param  string $path Diretório
@@ -80,7 +80,7 @@ class FileDownload {
 	}
 
 	/**
-	 * <h1>Baixar Arquivo</h1>
+	 * Baixar Arquivo
 	 *
 	 * @method download
 	 * @return mixed Conteúdo do Arquivo

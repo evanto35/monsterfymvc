@@ -19,7 +19,7 @@
 #############################################################################
 
 /**
- * <h1>Controller do Dashboard</h1>
+ * Controller do Dashboard
  *
  * @package controllers
  * @author  Leandro Medeiros
@@ -41,7 +41,7 @@ class DashboardController extends BaseController {
 
 
     /**
-     * <h1>Exibir HomePage (override)</h1>
+     * Exibir HomePage (override)
      *
      * @method goHome
      * @param  boolean $forceRefresh Forçar atualização dos Dados

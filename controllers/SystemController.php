@@ -19,7 +19,7 @@
 #############################################################################
 
 /**
- * <h1>Controller do System</h1>
+ * Controller do System
  *
  * @package controllers
  * @author  Leandro Medeiros
@@ -35,7 +35,7 @@ class SystemController extends BaseController {
 
 
     /**
-     * <h1>Exibir HomePage (override)</h1>
+     * Exibir HomePage (override)
      *
      * @method goHome
      * @param  boolean $forceRefresh Forçar atualização dos Dados
@@ -45,6 +45,22 @@ class SystemController extends BaseController {
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
      */
 	public function goHome($forceRefresh = false) {
-        return $this->View->load();
+        return $this->getUsers();
+    }
+
+    /**
+     * [getUsers description]
+     *
+     * @method getUsers
+     * @param  [type] $arguments [description]
+     * @return [type] [description]
+     * @author Leandro Medeiros
+     * @since  2015-08-18
+     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     */
+    public function getUsers($arguments = null) {
+        $list = $this->CurrentUser->getList();
+
+        return $this->View->load($list);
     }
 }

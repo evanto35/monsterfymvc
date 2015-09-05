@@ -19,7 +19,7 @@
 #############################################################################
 
 /**
- * <h1>Classe base para uma DTO</h1>
+ * Classe base para uma DTO
  * 
  * <p>Todas as DTO da aplicação devem estender esta.</p>
  * 
@@ -38,4 +38,22 @@ class BaseDTO {
      * @var boolean
      */
     public $active = true;
+
+    public static function getClassForTable($tableName) {
+        if (!preg_match_all('@([A-Za-z0-9]+)_*@', $tableName, $matches)) {
+            $dtoName = $tableName;
+        }
+        else {
+            $dtoName = '';
+            array_shift($matches);
+
+            foreach($matches[0] as $entitie) {
+                $dtoName .= ucfirst($entitie);
+            }
+        }
+
+        $dtoName .= 'DTO';
+
+        return $dtoName;
+    }
 }

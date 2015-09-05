@@ -51,5 +51,10 @@
 
     /* Logoff via GET */
     if (isset($_GET['action']) && $_GET['action'] == 'flush') {
+        unset($_GET);
         session_destroy();
+
+        foreach (glob(APP_LOCAL_PATH . '/log/*') as $file) {
+            unlink($file);
+        }
     }

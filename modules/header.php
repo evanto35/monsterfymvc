@@ -34,13 +34,9 @@
         <link type="text/css" href="<?php echo APP_REMOTE_PATH; ?>/assets/css/monsterfy.css" rel="stylesheet">
 
         <!-- DataTables CSS -->
-        <link rel="stylesheet" type="text/css" href="<?php echo APP_REMOTE_PATH; ?>/plugins/DataTables/media/css/jquery.dataTables.css">
-
-        <!-- jQuery ->
-        <script type="text/javascript" charset="utf8" src="<?php echo APP_REMOTE_PATH; ?>/plugins/DataTables/media/js/jquery.js"></script-->
-
-        <!-- DataTables -->
-        <script type="text/javascript" charset="utf8" src="<?php echo APP_REMOTE_PATH; ?>/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+        <link rel="stylesheet" type="text/css" href="<?php echo APP_REMOTE_PATH; ?>/plugins/DataTables/datatables.min.css"/>
+        <script type="text/javascript" src="<?php echo APP_REMOTE_PATH; ?>/plugins/DataTables/datatables.min.js"></script>
+        <!--link rel="stylesheet" type="text/css" href="<?php echo APP_REMOTE_PATH; ?>/plugins/DataTables/media/css/jquery.dataTables.css"-->
     </head>
 
 	<body>
@@ -68,9 +64,11 @@
                 <div class="collapse navbar-collapse">                
                     <ul class="nav navbar-nav">
                         <?php foreach ($this->navigator as $Dto): ?>
-                            <li class="<?php echo $Dto->name == $this->module ? 'active' : '';  ?>" >    
-                                <a href="../<?php echo strtolower($Dto->name); ?>"><?php echo $Dto->title; ?></a>
-                            </li>
+                            <?php if ($Dto->menu_order): ?>
+                                <li class="<?php echo $Dto->name == $this->module ? 'active' : '';  ?>" >    
+                                    <a href="../<?php echo strtolower($Dto->name); ?>"><?php echo $Dto->title; ?></a>
+                                </li>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                     </ul>
                     

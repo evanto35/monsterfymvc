@@ -19,7 +19,7 @@
 #############################################################################
 
 /**
- * <h1>DTO do Usuário</h1>
+ * DTO do Usuário
  *
  * @package models
  * @author  Leandro Medeiros

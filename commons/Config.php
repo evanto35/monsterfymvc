@@ -19,7 +19,7 @@
 #############################################################################
 
 /**
- * <h1>Configurações</h1>
+ * Configurações
  * 
  * <p>Contém constantes de parametrização da aplicação. Modifique à vontade.</p>
  *
@@ -110,8 +110,11 @@ abstract class Config {
     /* Variáveis para depuração */
     const IDX_DEBUGGING = 'idx_04';
 
+    /* Log de Queries */
+    const LOG_QUERIES = true;
+    
     /**
-     * <h1>Obter String de Conexão</h1>
+     * Obter String de Conexão
      *
      * @method getConnectionString
      * @return string String para conexão ao banco no formato de PDO

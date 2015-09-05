@@ -19,7 +19,7 @@
 #############################################################################
 
 /**
- * <h1>DTO do Módulo</h1>
+ * DTO do Módulo
  *
  * @package models
  * @author 	Leandro Medeiros

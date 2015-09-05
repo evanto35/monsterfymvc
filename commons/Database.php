@@ -19,7 +19,7 @@
 #############################################################################
 
 /**
- * <h1>Banco de Dados</h1>
+ * Banco de Dados
  * 
  * <p>Responsável pela comunicação com o banco de dados.</p>
  *
@@ -36,7 +36,7 @@ final class Database {
     private static $connection;
 
     /**
-     * <h1>Obter Conexão</h1>
+     * Obter Conexão
      *
      * <p>Faz o controle do singleton.</p>
      *
@@ -69,7 +69,7 @@ final class Database {
     }
 
     /**
-     * <h1>Preparar Script</h1>
+     * Preparar Script
      *
      * @method prepare
      * @param  string $script Script que será executado

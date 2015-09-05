@@ -19,7 +19,7 @@
 #############################################################################
 
 /**
- * <h1>Classe Script</h1>
+ * Classe Script
  * 
  * <p>Classe para executar scripts no banco de dados
  * baseado na estrutura de um DTO.</p>
@@ -34,19 +34,13 @@ final class Script {
      * Argumentos do script
      * @var array
      */
-    private $args   = array();
+    private $args = array();
 
     /**
      * Dataset com retorno do script
      * @var array
      */
     public  $dataset = array();
-
-    /**
-     * Tabela
-     * @var string
-     */
-    public $table;
 
     /**
      * Chave primária
@@ -61,19 +55,21 @@ final class Script {
     public $deactiveOnDelete = true;
 
     /**
-     * Atributos correspondentes na tabela de origem
-     * @var array
-     */
-    public $fields = array();
-
-    /**
      * SQL que será executado
      * @var string
      */
     public $sql;
 
+    private $_alias;
+    private $_select = array();
+    private $_from;
+    private $_where = array();
+    private $_join  = array();
+    private $_order = array();
+    private $_limit;
+
     /**
-     * <h1>Construtor</h1>
+     * Construtor
      *
      * @method __construct
      * @param  BaseDTO $Dto Objeto DTO para configurar os campos da tabela 
@@ -81,27 +77,243 @@ final class Script {
      * @since  2015-07-08
      * @link   http://bitbucket.org/leandro_medeiros/monsterfymvc
      */
-    final public function __construct(BaseDTO $Dto) {
-		$this->fields = array_keys(get_object_vars($Dto));
+    final public function __construct($mainTable, $alias = null) {
+        if (!is_string($mainTable)) {
+            throw new Exception('Nome de tabela inválido');
+        }
+
+        $this->_from   = $mainTable;
+        $this->_alias  = !empty($alias) ? $alias : $this->_from;
+    }
+
+///////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////// MÉTODOS PROTEGIDOS /////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Obter campos selecionados
+     *
+     * @method getFields
+     * @return string Campos com apelidos
+     * @author Leandro Medeiros
+     * @since  2015-08-26
+     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     */
+    protected function getFields() {
+        $result = array();
+
+        if (empty($this->_select)) {
+            $this->selectAs();
+        }
+
+        foreach($this->_select as $field) {
+            if (preg_match('@(.+)\.(.+)@', $field, $matches))
+                $result[] = sprintf('`%s`.`%s`', $matches[1], $matches[2]);
+            else
+                $result[] = sprintf('`%s`.`%s`', $this->_alias, $field);
+        }
+
+        $result = (empty($result) ? '*' : implode(',' . PHP_EOL . "       ", $result));
+
+        return $result . PHP_EOL;
     }
 
     /**
-     * <h1>Obter script SELECT</h1>
+     * Obter cláusula "FROM"
      *
-     * @method getSelect
-     * @return Script própria instância
+     * @method getFrom
+     * @return string Cláusula
      * @author Leandro Medeiros
-     * @since  2015-07-09
+     * @since  2015-08-26
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
      */
-	public function getSelect() {
-		$this->sql = "SELECT `" . implode('`, `', $this->fields) . "` FROM {$this->table} ";
+    protected function getFrom() {
+        $result = "  FROM `{$this->_from}` ";
 
-		return $this;
-	}
+        if ($this->_from != $this->_alias) {
+            $result .= "`{$this->_alias}` ";
+        }
+
+        return $result . PHP_EOL;
+    }
 
     /**
-     * <h1>Adicionar uma condição</h1>
+     * Obter os joins
+     *
+     * @method getJoin
+     * @return string Cláusulas
+     * @author Leandro Medeiros
+     * @since  2015-08-26
+     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     */
+    protected function getJoin() {
+        $result = '';
+
+        foreach($this->_join as $join) {
+            $result .= sprintf('  %s JOIN `%s` `%s` ON (`%s`.`%s` = `%s`.`%s`)',
+                        $join['type'],
+                        $join['toTable'],
+                        $join['linkAlias'],
+                        $this->_alias,
+                        $join['linkBy'],
+                        $join['toTable'],
+                        $join['linkTo']
+                    ) . PHP_EOL;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Obter cláusula WHERE
+     *
+     * @method getWhere
+     * @return string Cláusula
+     * @author Leandro Medeiros
+     * @since  2015-08-26
+     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     */
+    protected function getWhere() {
+        $result = '';
+
+        if (!empty($this->_where)) {
+            $result = implode(')' . PHP_EOL . "   AND (", $this->_where);
+            $result = " WHERE ({$result})" . PHP_EOL;
+        }
+
+        return $result;
+    }
+
+    public function getOrder() {
+        $result = array();
+
+        foreach($this->_order as $field) {
+            if (preg_match('@^`{0,1}(.+)`{0,1}\.`{0,1}(\w+)`{0,1}(.+)$@', $field, $matches)) {
+                $result[] = sprintf("`%s`.`%s`%s", $matches[1], $matches[2], $matches[3]);
+            }
+
+            else {
+                $vars = explode(' ', $field);
+                $result[] = sprintf("`%s`.`%s`%s", $this->_alias, $vars[0], $vars[1]);
+            }
+        }
+
+        $result = implode(', ', $result);
+
+        if (!empty($result))
+            $result = " ORDER BY " . $result;
+
+        return $result;
+    }
+
+///////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////// MÉTODOS PÚBLICOS //////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Atribui um alias à tabela principal da busca
+     *
+     * @method alias
+     * @param  string $alias Apelido Desejado
+     * @return Script Própria Instância
+     * @author Leandro Medeiros
+     * @since  2015-08-26
+     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     */
+    public function alias($alias) {
+        if (empty($alias)) {
+            throw new Exception('Apelido não pode ser vazio!');
+        }
+
+        $this->_alias = $alias;
+
+        return $this;
+    }
+
+    /**
+     * Inclui um campo na seleção
+     *
+     * @method select
+     * @param  string $select Campo
+     * @return Script Própria Instância
+     * @author Leandro Medeiros
+     * @since  2015-08-26
+     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     */
+    public function select($select) {
+        $this->_select[] = $select;
+
+        return $this;
+    }
+
+    public function selectAs() {
+        $this->_select = array();
+
+        $dtoclass = BaseDTO::getClassForTable($this->_from);
+
+        if (!class_exists($dtoclass)) {
+            throw new Exception(sprintf('Classe DTO para a tabela "%s" não existe!', $dtoclass));
+        }
+
+        $fields = get_class_vars($dtoclass);
+
+        foreach ($fields as $property => $value) {
+            $this->select($property);
+        }
+
+        return $this;
+    }
+
+    public function from($table) {
+        $this->_from = $table;
+
+        return $this;
+    }
+
+    /**
+     * Inclui uma clásula JOIN
+     *
+     * @method join
+     * @author Leandro Medeiros
+     * @since  2015-08-26
+     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     * 
+     * @param  string $toTable Nome da tabela que se deseja juntar
+     * @param  string $linkBy Campo local que será usado para juntar as tabelas
+     * @param  string $linkAlias Apelido para a tabela de pesquisa
+     * @param  string $linkTo Campo da tabela de pesquisa que será usado na junção
+     * @param  string $linkType Tipo da junção
+     * 
+     * @return Script Própria Instância
+     */
+    final public function join($toTable, $linkBy, $linkAlias = '', $linkTo = 'id', $linkType = 'INNER') {
+        # Validação tipo de união
+        if (!preg_match('@^(INNER|LEFT|CROSS|RIGHT)$@i', $linkType)) {
+            throw new Exception('União Inválida: ' . $linkType);
+        }
+
+        $dtoclass = BaseDTO::getClassForTable($toTable);
+
+        # Validação campo da tabela de pesquisa
+        if (!property_exists($dtoclass, $linkTo)) {
+            throw new Exception("Propriedade '{$linkTo}' não existe na tabela de pesquisa");
+        }
+
+        # Salvando o join
+        $join = array(
+            'type'      => $type,
+            'toTable'   => $toTable,
+            'linkAlias' => empty($linkAlias) ? $toTable : $linkAlias,
+            'linkBy'    => $linkBy,
+            'linkTo'    => $linkTo
+        );
+        $this->_join[$toTable] = $join;
+
+        return $this;
+    }
+
+    /**
+     * Adicionar uma condição
      *
      * @method where
      * @return Script própria instância
@@ -109,171 +321,125 @@ final class Script {
      * @since  2015-07-09
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
      */
-    public function where($conditions = '', $link = 'AND') {
-        if (strpos(strtoupper($this->sql), 'WHERE')) {
-            $this->sql .= $link;
-        }
-        else {
-            $this->sql .= ' WHERE ';
+    public function where($conditions) {
+        if (!is_array($conditions)) {
+            $conditions = array($conditions);
         }
 
-        if (!empty($conditions)) {
-            if (is_array($conditions)) {
-                foreach ($conditions as $field => $value) {
-                    $this->sql .= " {$link} ({`$field`} = {$value} ";
-                }
+        foreach($conditions as $condition) {
+            if (preg_match('@`{0,1}(.+)`{0,1}\.`{0,1}(\w+)`{0,1}(.*)@', $condition, $matches)) {
+                $this->_where[] = sprintf('`%s`.`%s`%s', $matches[1], $matches[2], $matches[3]);
             }
             else {
-                $this->sql .= " ({$conditions}) ";
+                $this->_where[] = $condition;
+            }
+
+            $args = func_get_args();
+            
+            if (count($args) > 1) {
+                $count = preg_match_all('@(:\w+)@', $condition, $placeholders);
+
+                array_shift($args);
+                array_shift($placeholders);
+
+                if (count($args) != $count) {
+                    throw new Exception('Contagem de argumentos e valores não conferem!');
+                }
+
+                foreach($args as $idx => $value) {
+                    $this->addArgument($placeholders[$idx][0], $value);
+                }
             }
         }
-        else if (!empty($this->{$this->primaryKey})) {
-            $this->sql .= " (({$this->table}.{$this->primaryKey} = :id) AND {$this->table}.active) ";
-        }
-        else {
-            $this->sql .= " ({$this->table}.active) ";
-        }
+
+        return $this;
+    }
+
+    public function order($field) {
+        $this->_order[] = $field;
+        
+        return $this;
+    }
+
+    /**
+     * Executar Script
+     *
+     * @method execute
+     * @param  boolean $keepArguments Manter Argumentos após execução do script
+     * @return mixed   Contagem de registros obtidos em caso de select ou booleano indicando sucesso
+     * @author Leandro Medeiros
+     * @since  2015-07-09
+     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     */
+    public function execute($script = '', $keepArguments = false) {
+        try {
+            if (!empty($script)) {
+                $this->sql = $script;
+            }
+            else if (empty($this->sql)) {
+                $this->getSelect();
+            }
+
+            if (empty($this->args)) {
+                $statement     = Database::prepare($this->sql);
+                $this->dataset = $statement->execute();
+            }
+            else {
+                $statement     = Database::prepare($this->sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+                $this->dataset = $statement->execute($this->args);
+            }
             
-        return $this;
-    }
+            $fetch = Lib::startsWith(strtoupper(trim($this->sql)), 'SELECT');
 
-    /**
-     * <h1>Adicionar cláusula ORDER</h1>
-     *
-     * @method order
-     * @return Script própria instância
-     * @author Leandro Medeiros
-     * @since  2015-07-09
-     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
-     */
-    public function order($conditions) {
-        if (!empty($conditions)) {
-            $this->sql .= " ORDER BY {$conditions} ";
+            if (!$fetch) {
+                $result = true;
+            }
+            else if (!empty($this->dataset)) {
+                $this->dataset = $statement->fetchAll(PDO::FETCH_ASSOC);
+                $result = count($this->dataset);
+            }
         }
-        return $this;
-    }
-
-    /**
-     * <h1>Adiciona cláusula LIMIT</h1>
-     *
-     * @method limit
-     * @return Script própria instância
-     * @author Leandro Medeiros
-     * @since  2015-07-09
-     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
-     */
-    public function limit($max = 1) {
-        if (!empty($max)) {
-            $this->sql .= " LIMIT {$max} ";
-        }
-        return $this;
-    }
-
-    /**
-     * <h1>Obter script UPDATE</h1>
-     *
-     * @method getUpdate
-     * @return Script própria instância
-     * @author Leandro Medeiros
-     * @since  2015-07-08
-     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
-     */
-    public function getUpdate() {
-		$this->sql = "UPDATE {$this->table}
-				         SET ({implode(', ', $this->fields)})
-				       WHERE {$this->table}.{$this->primaryKey} = :id ";
-        return $this;
-	}
-
-    /**
-     * <h1>Obter script INSERT</h1>
-     *
-     * @method getUpdate
-     * @return Script própria instância
-     * @author Leandro Medeiros
-     * @since  2015-07-08
-     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
-     */
-	public function getInsert() {
-		$this->sql = "INSERT INTO {$this->table} (" . implode(', ', $this->args) . ") 
- 				           VALUES (:" . implode(', :', $this->args) . ")";
-        return $this;
-	}
-
-	/**
-	 * <h1>Obter script DELETE</h1>
-	 *
-	 * @method getDelete
-	 * @return Script própria instância
-	 * @author Leandro Medeiros
-	 * @since  2015-07-08
-	 * @link   http://bitbucket.org/leandro_medeiros/monsterfymvc
-	 */
-	public function getDelete() {
-		if ($this->deactiveOnDelete) {
-			$this->sql = "UPDATE {$this->table}
-					         SET (active = false) 
-					       WHERE {$this->table}.{$this->primaryKey} = :id";
-        }
-		else {
-			$this->sql = "DELETE FROM {$this->table} WHERE {$this->table}.{$this->primaryKey}ß = :id";
+        catch (Exception $ex) {
+            Lib::log($ex, true);
+            $result = false;
         }
 
-        return $this;
-	}
+        if (!is_array($this->dataset)) {
+            $this->dataset = array();
+        }
+
+        $this->log();
+        $this->sql = null;
+        
+        if (!$keepArguments) $this->clearArguments();
+
+        return $result;
+    }    
 
     /**
-     * <h1>Serializar</h1>
-     *
-     * @method __sleep
-     * @return array Atributos que devem ser serializados
-     * @author Leandro Medeiros
-     * @since  2015-07-08
-     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
-     */
-    public function __sleep() {
-        return array('args', 'dataset');
-    }
-
-    /**
-     * <h1>Limpa Argumentos</h1>
-     *
-     * @method clearArguments
-     * @return Script própria instância
-     * @author Leandro Medeiros
-     * @since  2015-07-08
-     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
-     */
-    public function clearArguments() {
-        unset($this->args);
-        $this->args = array();
-        return $this;
-    }
-
-    /**
-     * <h1>Adicionar Parâmetro</h1>
+     * Adicionar Parâmetro
      * 
      * <p>Adiciona um argumento aos parâmetros do script.</p>
      *
      * @method addArgument
      * @param  string $argument Nome do argumento
-     * @param  mixed  $value	Valor do argumetno
+     * @param  mixed  $value    Valor do argumetno
      * @author Leandro Medeiros
      * @since  2015-07-09
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
      */
     public function addArgument($argument, $value) {
-        $argument = ':' . $argument;
-        
-        if (strpos($this->sql, $argument) !== false) {
-            $this->args[$argument] = $value;
+        if (!preg_match('@^:\w+$@', $argument)) {
+            $argument = ':' . $argument;
         }
+
+        $this->args[$argument] = $value;
 
         return $this;
     }
-    
+
     /**
-     * <h1>Definir Parâmetros</h1>
+     * Definir Parâmetros
      * 
      * <p>Define os argumentos do script a partir de um DTO.</p>
      *
@@ -288,67 +454,127 @@ final class Script {
         $this->clearArguments();
 
         foreach ($Dto as $arg => $value) {
-            $this->addArgument($arg, $value);
+            if (isset($value)) {
+                $this->addArgument($arg, $value);
+            }
         }
 
         return $this;
     }
 
     /**
-     * <h1>Executar Script</h1>
+     * Limpa Argumentos
      *
-     * @method execute
-     * @param  boolean $keepArguments Manter Argumentos após execução do script
-     * @return boolean Sucesso
+     * @method clearArguments
+     * @return Script própria instância
+     * @author Leandro Medeiros
+     * @since  2015-07-08
+     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     */
+    public function clearArguments() {
+        unset($this->args);
+        $this->args = array();
+        return $this;
+    }
+
+    public function reset() {
+        $this->_select = array();
+        $this->_where  = array();
+        $this->_join   = array();
+        $this->_order  = array();
+        $this->_limit  = '';
+    }
+
+    /**
+     * Obter script SELECT
+     *
+     * @method getSelect
+     * @return Script própria instância
      * @author Leandro Medeiros
      * @since  2015-07-09
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
      */
-    public function execute($keepArguments = false) {
-        try {
-            if (!empty($this->args)) {
-                $statement     = Database::prepare($this->sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-                $this->dataset = $statement->execute($this->args);
-            }
+    public function getSelect() {
+        $this->sql  = 'SELECT '
+                    . $this->getFields() # Campos selecionados
+                    . $this->getFrom()   # Tabela principal na consulta
+                    . $this->getJoin()   # Joins
+                    . $this->getWhere()  # Where
+                    . $this->getOrder()  # Order
+                    . ';';
 
-            else {
-                $statement     = Database::prepare($this->sql);
-                $this->dataset = $statement->execute();
-            }
-            
-            if (!Lib::startsWith(strtoupper(trim($this->sql)), 'SELECT')) {
-                return true;
-            }
-            else if (!empty($this->dataset)) {
-                $this->dataset = $statement->fetchAll(PDO::FETCH_ASSOC);
-                return (count($this->dataset) > 0);
-            }
-
-            if (!$keepArguments) $this->clearArguments();
-        }
-
-        catch (Exception $e) {
-            Lib::log($e);
-        }
-
-        return false;
+        return $this;
     }
 
     /**
-     * <h1>Obter BLOB</h1>
+     * Obter script UPDATE
+     *
+     * @method getUpdate
+     * @return Script própria instância
+     * @author Leandro Medeiros
+     * @since  2015-07-08
+     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     */
+    public function update() {
+		$this->sql = "UPDATE {$this->table}
+				         SET ({implode(', ', $this->fields)})
+				       WHERE {$this->table}.{$this->primaryKey} = :id;";
+        return $this->execute();
+	}
+
+    /**
+     * Obter script INSERT
+     *
+     * @method getUpdate
+     * @return Script própria instância
+     * @author Leandro Medeiros
+     * @since  2015-07-08
+     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     */
+	public function insert() {
+		$this->sql = "INSERT INTO {$this->table} (" . implode(', ', $this->args) . ") 
+ 				           VALUES (:" . implode(', :', $this->args) . ");";
+        return $this->execute();
+	}
+
+	/**
+	 * Obter script DELETE
+	 *
+	 * @method getDelete
+	 * @return Script própria instância
+	 * @author Leandro Medeiros
+	 * @since  2015-07-08
+	 * @link   http://bitbucket.org/leandro_medeiros/monsterfymvc
+	 */
+	public function delete() {
+		if ($this->deactiveOnDelete) {
+			$this->sql = "UPDATE {$this->table}
+					         SET (active = false) 
+					       WHERE {$this->table}.{$this->primaryKey} = :id;";
+        }
+		else {
+			$this->sql = "DELETE FROM {$this->table} WHERE {$this->table}.{$this->primaryKey} = :id;";
+        }
+
+        return $this->execute();
+	}
+
+    /**
+     * Obter BLOB
      *
      * <p>Executa uma consulta na tabela e retorna o binário do registro.<p>
      *
      * @method getBlob
-     * @param  string $field Campo que contém dados binários
-     * @param  string $where Condições da consulta
-     * @return mixed  Binário
      * @author Leandro Medeiros
      * @since  2015-07-09
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     * 
+     * @param  string $field Campo que contém dados binários
+     * @param  string $where Condições da consulta
+     * @return mixed  Binário
      */
     public function getBlob($field, $where) {
-        $query = "SELECT {$field} FROM {$this->Script->table} WHERE {$where}";
+        $query = "SELECT {$field} FROM {$this->Script->table} WHERE {$where};";
 
         $statement = Database::prepare($query);
         $statement->execute();
@@ -356,5 +582,12 @@ final class Script {
         $statement->fetch(PDO::FETCH_BOUND);
 
         return $blob;
+    }
+
+    protected function log() {
+        if (Config::LOG_QUERIES) {
+            $log = sprintf("\nScript:\n%s\n\nParametros:\n%s", $this->sql, print_r($this->args, true));
+            Lib::log($log, false, '_script');
+        }
     }
 }

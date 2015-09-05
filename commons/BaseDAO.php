@@ -19,7 +19,7 @@
 #############################################################################
 
 /**
- * <h1>Classe base para uma DAO</h1>
+ * Classe base para uma DAO
  * 
  * <p>Todas as models da aplicação devem estender esta.</p>
  *
@@ -51,7 +51,7 @@ abstract class BaseDAO {
     protected $Dto;
 
     /**
-     * <h1>Construtor</h1>
+     * Construtor
      *
      * @method __construct
      * @param  BaseDTO $Dto Instância de DTO para configurar o DAO
@@ -61,16 +61,13 @@ abstract class BaseDAO {
      * @link   http://bitbucket.org/leandro_medeiros/monsterfymvc
      */
     public function __construct(BaseDTO $Dto, $tableName = '') {
-        $this->instanceClass   = get_class($this);
-        $this->Script          = new Script($Dto);
+        $this->instanceClass = get_class($this);
 
         if (empty($tableName)) {
-            $this->Script->table = strtolower($this->instanceClass);
-        }
-        else {
-            $this->Script->table = $tableName;
+            $tableName = strtolower($this->instanceClass);
         }
 
+        $this->Script = new Script($tableName);
         $this->setDto($Dto);
 
         if (!$this instanceof User) {
@@ -79,7 +76,7 @@ abstract class BaseDAO {
     }
 
     /**
-     * <h1>Setter</h1>
+     * Setter
      * 
      * <p>Valida antes de atribuir as propriedades privadas</p>
      *
@@ -126,10 +123,14 @@ abstract class BaseDAO {
         else if (property_exists(get_class($this->Dto), $property)) {
             return $this->Dto->$property;
         }
+
+        else {
+            return null;
+        }
     }
 
     /**
-     * <h1>Setter do DTO</h1>
+     * Setter do DTO
      *
      * @method setDto
      * @param  BaseDTO $Dto DTO correspondente ao DAO
@@ -147,7 +148,7 @@ abstract class BaseDAO {
     }
 
     /**
-     * <h1>Inserir novo registro</h1>
+     * Inserir novo registro
      *
      * @method insert
      * @return boolean Sucesso
@@ -162,7 +163,7 @@ abstract class BaseDAO {
     }
 
     /**
-     * <h1>Atualizar Registro</h1>
+     * Atualizar Registro
      *
      * @method update
      * @return boolean Sucesso
@@ -177,7 +178,7 @@ abstract class BaseDAO {
     }
 
     /**
-     * <h1>Salvar</h1>
+     * Salvar
      * 
      * <p>Salva os dados obtidos do DTO no banco de dados. Se
      * a chave primária estiver setada executa um UPDATE, senão
@@ -199,73 +200,41 @@ abstract class BaseDAO {
     }
 
     /**
-     * <h1>Select</h1>
+     * Obter Lista
      *
-     * <p>Executa uma consulta na tabela correspondente ao DAO.</p>
-     *
-     * @method select
-     * @param  string $conditions Condições para WHERE
-     * @return array Resultado da consulta
+     * @method getList
      * @author Leandro Medeiros
      * @since  2015-07-09
-     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     * @link   Repositório http:/bitbucket.org/leandro_medeiros/monsterfymvc
+     * 
+     * @param  BaseDTO $Dto         Instância DTO
+     * @param  string  $conditions  Condições para a consulta
+     * @return array
      */
-    public function select($conditions) {
-        $resetDto = false;
-
-        $this->Script->getSelect();
-
+    public function getList($conditions = null, $order = null, $resultIndex = 'id') {
         if (!empty($conditions)) {
             $this->Script->where($conditions);
         }
 
-        else if (!empty($this->Dto->id)) {
-            $resetDto = true;
-            $this->Script->where()
-                         ->limit(1);
+        if (!empty($order)) {
+            $this->Script->order($order);
         }
-
-        else {
-            $this->Script->where("$this->Script->table.active");
-        }
-
-        $result = $this->Script->setArguments($this->Dto)
-                               ->execute();
-
-        if ($result && $resetDto) {
-            Lib::datasetToDto($this->Dto, $this->Script->dataset[0]);
-        }
-
-        return $result;
-    }
-
-    /**
-     * <h1>Obter Lista</h1>
-     *
-     * @method getList
-     * @param  BaseDTO $Dto         Instância DTO
-     * @param  string  $conditions  Condições para a consulta
-     * @return array Lista
-     * @author Leandro Medeiros
-     * @since  2015-07-09
-     * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
-     */
-    public static function getList(BaseDTO $Dto, $conditions = '', $order = '', $resultIndex = 'id') {
-        $dtoClass      = get_class($Dto);
-        $Script        = new Script($Dto);
-        $Script->table = strtolower(preg_replace('/DTO$/', '', $dtoClass));
-        $list          = array();
         
-        if ($Script->getSelect()->where($conditions)->order($order)->execute()) {
-            foreach($Script->dataset as $element) {
-                $idx = $element[$resultIndex];
+        if (!$this->Script->execute()) {
+            return array();
+        }
+        
+        $list = array();
+        foreach($this->Script->dataset as $element) {
+            $idx = $element[$resultIndex];
+            $dto = get_class($this->Dto);
+            $dto = new $dto;
 
-                if ($resultIndex != 'id') {
-                    $list[$idx][] = Lib::datasetToDto(new $dtoClass(), $element);
-                }
-                else {
-                    $list[$idx] = Lib::datasetToDto(new $dtoClass(), $element);
-                }
+            if ($resultIndex != 'id') {
+                $list[$idx][] = Lib::datasetToDto($dto, $element);
+            }
+            else {
+                $list[$idx] = Lib::datasetToDto($dto, $element);
             }
         }
 

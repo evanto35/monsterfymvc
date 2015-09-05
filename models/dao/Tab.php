@@ -19,7 +19,7 @@
 #############################################################################
 
 /**
- * <h1>DAO das Abas</h1>
+ * DAO das Abas
  *
  * @package models
  * @author  Leandro Medeiros
@@ -28,7 +28,7 @@
  */
 class Tab extends BaseDAO {
     /**
-     * <h1>Construtor</h1>
+     * Construtor
      *
      * @method __construct
      * @param  TabDTO $Dto
@@ -41,7 +41,7 @@ class Tab extends BaseDAO {
     }
 
     /**
-     * <h1>Obter Lista (override)</h1>
+     * Obter Lista (override)
      *
      * @method getList
      * @return array Lista
@@ -49,8 +49,8 @@ class Tab extends BaseDAO {
      * @since  2015-07-09
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
      */
-    public static function getList() {
-    	return parent::getList(new TabDTO(), '', 'menu_order', 'module_id');
+    public function getList() {
+    	return parent::getList(null, 'menu_order', 'module_id');
     }
 }
 

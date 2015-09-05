@@ -19,7 +19,7 @@
 #############################################################################
 
 /**
- * <h1>View</h1>
+ * View
  * 
  * <p>Retorno de qualquer requisicão à Controller.</p>
  *
@@ -75,10 +75,10 @@ final class View {
      * Dados complementares
      * @var mixed
      */
-    public $data;
+    private $data;
 
     /**
-     * <h1>Getter</h1>
+     * Getter
      *
      * @method __get
      * @param  string $property Nome da Propriedade
@@ -96,7 +96,7 @@ final class View {
     }
 
     /**
-     * <h1>Construtor</h1>
+     * Construtor
      *
      * @method __construct
      * @param  string $module Módulo de Origem
@@ -114,7 +114,7 @@ final class View {
     }
 
     /**
-     * <h1>Setter do Título</h1>
+     * Setter do Título
      *
      * @method setTitle
      * @param  string $title Título desejado
@@ -127,7 +127,7 @@ final class View {
     }
 
     /**
-     * <h1>Carregar Página</h1>
+     * Carregar Página
      *
      * @method load
      * @param  boolean $jsonResponse Retornar JSON
@@ -152,7 +152,7 @@ final class View {
     }
 
     /**
-     * <h1>Definir Barra de Navegação</h1>
+     * Definir Barra de Navegação
      *
      * @method setNavigator
      * @author Leandro Medeiros

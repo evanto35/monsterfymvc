@@ -1,5 +1,6 @@
 <?php
 #############################################################################
+##																		   ##
 ##   MonsterfyMVC - MVC Framework for PHP + MySQL                          ##
 ##   Copyright (C) 2012  Leandro Medeiros                                  ##
 ##                                                                         ##
@@ -44,7 +45,7 @@ class System {
 	public $userModules = array();
 
 	/**
-	 * <h1>Armazenar</h1>
+	 * Armazenar
 	 *
 	 * @method selfStore
 	 * @return System Própria Instância
@@ -59,7 +60,7 @@ class System {
 	}
 
 	/**
-	 * <h1>Obter Armazenado</h1>
+	 * Obter Armazenado
 	 *
 	 * @author Leandro Medeiros
 	 * @since  2015-07-10
@@ -77,7 +78,7 @@ class System {
 	}
 	
 	/**
-	 * <h1>Construtor</h1>
+	 * Construtor
 	 *
 	 * @method __construct
 	 * @return System Nova Instância
@@ -87,12 +88,13 @@ class System {
 	 */
 	protected function __construct() {
 		$this->CurrentUser = User::getLogged();
+		$this->refreshAll();
 
-		return $this->refreshAll();
+		return $this;
 	}
 	
 	/**
-	 * <h1>Atualizar Tudo</h1>s
+	 * Atualizar Tudos
 	 *
 	 * @method refreshAll
 	 * @return System Própria Instância
@@ -107,26 +109,8 @@ class System {
 					->selfStore();
 	}
 
-	protected function refreshUserModules() {
-		$Script = new Script(new BaseDTO());
-		$Script->sql = 'SELECT user_module.module_id
-						  FROM user_module
-						  JOIN module ON (user_module.module_id = module.id)
-						 WHERE user_module.user_id = :userId
-					  ORDER BY module.menu_order';
-		$Script->addArgument('userId', $this->CurrentUser->id);
-		$Script->execute();
-
-		foreach($Script->dataset as $element) {
-			$id = $element['module_id'];
-			$this->userModules[$id] = $this->modules[$id];
-		}
-
-		return $this;
-	}
-
 	/**
-	 * <h1>Atualiza os Módulos</h1>
+	 * Atualiza os Módulos
 	 *
 	 * @method refreshModules
 	 * @return System Própria Instância
@@ -135,12 +119,14 @@ class System {
 	 * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
 	 */
 	public function refreshModules() {
-		$this->modules = Module::getList();
+		$this->modules = new Module(new ModuleDTO);
+		$this->modules = $this->modules->getList();
+
 		return $this;
 	}
 
 	/**
-	 * <h1>Atualiza as Abas</h1>
+	 * Atualiza as Abas
 	 *
 	 * @method refreshTabs
 	 * @return System Própria Instância
@@ -149,7 +135,24 @@ class System {
 	 * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
 	 */
 	public function refreshTabs() {
-		$this->tabs = Tab::getList();
+		$this->tabs = new Tab(new TabDTO);
+		$this->tabs = $this->tabs->getList();
+
+		return $this;
+	}
+
+	protected function refreshUserModules() {
+		$Script = new Script('user_module');
+		
+		$Script->select('module_id')
+			   ->where('user_id = :userId', $this->CurrentUser->id)
+			   ->execute();
+
+		foreach($Script->dataset as $element) {
+			$id = $element['module_id'];
+			$this->userModules[$id] = $this->modules[$id];
+		}
+
 		return $this;
 	}
 }

@@ -19,7 +19,7 @@
 #############################################################################
 
 /**
- * <h1>DAO do Usuário</h1>
+ * DAO do Usuário
  *
  * @package models
  * @author  Leandro Medeiros
@@ -40,16 +40,12 @@ class User extends BaseDAO {
 
     final static function login($user, $passwd) {   
         $passwd = md5($passwd);
-        $Script = new Script(new UserDTO());
-        $Script->table = 'user';
+        $Script = new Script('user');
         
         try {
-            $Script->getSelect()
-                   ->where('email = :user')
-                   ->where('password = :passwd')
-                   ->where('active')
-                   ->addArgument('user', $user)
-                   ->addArgument('passwd', $passwd);
+            $Script->where('user.email = :user', $user)
+                   ->where('user.password = :passwd', $passwd)
+                   ->where('user.active');
 
             if ($Script->execute())
                 return self::handleLoginResult($Script);

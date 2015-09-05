@@ -19,7 +19,7 @@
 #############################################################################
 
 /**
- * <h1>Controller base do Monsterfy</h1>
+ * Controller base do Monsterfy
  * 
  * <p>Todas as Controllers da aplicação devem estender esta.</p>
  *
@@ -60,7 +60,7 @@ abstract class BaseController {
     protected static $showNavigator = true;
 
     /**
-     * <h1>Construtor</h1>
+     * Construtor
      *
      * <p>Se não houver usuário autenticado exibe a tela de login,
      * caso contrário processa a requisição.</p>
@@ -96,7 +96,7 @@ abstract class BaseController {
     }
 
     /**
-     * <h1>Obter Requisição</h1>
+     * Obter Requisição
      *
      * <p>Armazena na sesão os argumentos da requisição (para reprocessar
      * em caso de erro) e limpa superglobal.</p>
@@ -127,7 +127,7 @@ abstract class BaseController {
     }
 
     /**
-     * <h1>Obter últimos parâmetros</h1>
+     * Obter últimos parâmetros
      *
      * @method getLastArgs
      * @return array Parâmetros da requisição mais recente
@@ -140,7 +140,7 @@ abstract class BaseController {
     }
     
     /**
-     * <h1>Limpar últimos parâmetros</h1>
+     * Limpar últimos parâmetros
      *
      * <p>Limpa o histórico de requisicões.</p>
      *
@@ -159,7 +159,7 @@ abstract class BaseController {
     }
 
     /**
-     * <h1>Exibir Home Page</h1>
+     * Exibir Home Page
      *
      * <p>Toda classe filha deve implementar este método para preencher um objeto
      * <code>View</code> e exibí-lo.</p>
@@ -174,7 +174,7 @@ abstract class BaseController {
     abstract protected function goHome();
 
     /**
-     * <h1>Ação</h1>
+     * Ação
      *
      * <p>Executa um método da controller de acordo com "action" da requisição e exibe
      * a view. Se o método não existir exibe a Home Page com uma mensagem de erro.</p>
@@ -215,7 +215,7 @@ abstract class BaseController {
     }    
 
     /**
-     * <h1>Obter View</h1>
+     * Obter View
      *
      * @method getView
      * @return View objeto view parametrizado de acordo com instância da Controller
@@ -241,7 +241,7 @@ abstract class BaseController {
     }
 
     /**
-     * <h1>Exibir Tela de Login</h1>
+     * Exibir Tela de Login
      *
      * @method loadLogin
      * @param  string $message Alerta (opcional)
@@ -257,7 +257,7 @@ abstract class BaseController {
     }
 
     /**
-     * <h1>Login</h1>
+     * Login
      * 
      * <p>Se conseguir autenticar o usuário exibe a HomePage do
      * módulo, senão exibe a tela de login novamente.</p>
@@ -311,7 +311,7 @@ abstract class BaseController {
     }
 
     /**
-     * <h1>Logout</h1>
+     * Logout
      *
      * <p>Finaliza a sesão do usuário e exibe a tela de login.</p>
      *
@@ -326,7 +326,7 @@ abstract class BaseController {
     } 
 
     /**
-     * <h1>Adicionar ao Depurador</h1>
+     * Adicionar ao Depurador
      *
      * <p>Guarda uma variavél para ser exibido na View</p>
      * <p>Usar apenas para fins de depuração</p>
@@ -343,7 +343,7 @@ abstract class BaseController {
     }
 
     /**
-     * <h1>"Depurar"</h1>
+     * "Depurar"
      *
      * <p>Exibe todos as variáveis guardadas para depuração</p>
      *

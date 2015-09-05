@@ -19,7 +19,7 @@
 #############################################################################
 
 /**
- * <h1>DAO do Módulo</h1>
+ * DAO do Módulo
  *
  * @package models
  * @author  Leandro Medeiros
@@ -28,7 +28,7 @@
  */
 class Module extends BaseDAO {
     /**
-     * <h1>Construtor</h1>
+     * Construtor
      *
      * @method __construct
      * @param  ModuleDTO $Dto
@@ -41,7 +41,7 @@ class Module extends BaseDAO {
     }
 
     /**
-     * <h1>Obter Lista (override)</h1>
+     * Obter Lista (override)
      *
      * @method getList
      * @return array Lista
@@ -49,7 +49,7 @@ class Module extends BaseDAO {
      * @since  2015-07-09
      * @link   http:/bitbucket.org/leandro_medeiros/monsterfymvc
      */
-    public static function getList() {
-    	return parent::getList(new ModuleDTO, '', 'menu_order');
+    public function getList() {
+    	return parent::getList(null, 'menu_order');
     }
 }

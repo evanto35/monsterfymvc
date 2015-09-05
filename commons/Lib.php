@@ -28,12 +28,10 @@ class Lib {
 	}
 
 	public static function startsWith($haystack, $needle) {
-	    // search backwards starting from haystack length characters from the end
 	    return $needle === "" || strrpos($haystack, $needle, -strlen($haystack)) !== FALSE;
 	}
 
 	public static function endsWith($haystack, $needle) {
-	    // search forward starting from end minus needle length characters
 	    return $needle === "" || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== FALSE);
 	}
 
@@ -48,13 +46,16 @@ class Lib {
         }
     }    
 
-	public function log($data) {
+	public function log($data, $clear = false, $customFileName = '') {
 	    $path = APP_LOCAL_PATH . '/log/';
 	    
         if (!is_dir($path)) mkdir($path, 0777);
 	    // if (!is_dir($path)) Lib::mkdir_r($path, 0755);
 
-	    $filename = $path . date('Y-m-d') . '.log';
+	    $filename = $path . date('Y-m-d') . $customFileName . '.log';
+
+        if ($clear && is_file($filename)) unlink($filename);
+        
 	    $fp = @fopen($filename, "a+");
 
 	    if ($fp !== false) {
@@ -62,11 +63,12 @@ class Lib {
 		        $data = print_r($data, true);
 		    }
 
-		    $str      = "\r\n###########################################################################################################\r\n";
-		    $str     .= "Log registrado às " . date("H:i:s") . "\r\n";
-		    $str     .= "Navegador: " . $_SERVER['HTTP_USER_AGENT'] . "\r\n";
-		    $str     .= "IP: " . $_SERVER['REMOTE_ADDR'];
-		    $str 	 .= "\r\n" . $data . "\r\n###########################################################################################################\r\n";
+		    $str  = "\r\n###########################################################################################################\r\n";
+		    $str .= "Log registrado às " . date("H:i:s") . "\r\n";
+		    $str .= "Navegador: " . $_SERVER['HTTP_USER_AGENT'] . "\r\n";
+		    $str .= "IP: " . $_SERVER['REMOTE_ADDR'];
+		    $str .= "\r\n" . $data . "\r\n\r\n";
+            // $str .= "\r\n" . $data . "\r\n###########################################################################################################\r\n";
 
 		    @fputs($fp, $str);
 		    fclose($fp);
