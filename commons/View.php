@@ -145,9 +145,7 @@ final class View {
             echo json_encode($this);
         }
         else {
-            require("modules/header.php");
-            require("modules/{$this->module}/content.php");
-            require("modules/footer.php");
+            require("modules/mainpage.tpl.php");
         }
     }
 

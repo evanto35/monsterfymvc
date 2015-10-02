@@ -4,10 +4,10 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta property="og:locale" content="pt_br" />
+        <meta name="og:locale" content="pt_br" />
 
-        <meta name="author" content="Leandro Melão Medeiros" ref="http://about.me/leandro.medeiros">
-        <meta name="package" content="Monsterfy MVC" ref="https://bitbucket.org/leandro_medeiros/monsterfymvc/">
+        <meta name="author" content="Leandro Melão Medeiros - http://about.me/leandro.medeiros">
+        <meta name="package" content="Monsterfy MVC - https://bitbucket.org/leandro_medeiros/monsterfymvc/">
         <meta name="title" content="Monsterfy MVC - PHP Framework" />
         <meta name="keyword" content="Monsterfy, MVC, PHP, PHP Framework, Leandro Medeiros, Leandro Melão Medeiros" />
         <meta name="description" content="Monsterfy MVC é um Framework para PHP + MySQL desenvolvido por Leandro Medeiros desde 2012.
