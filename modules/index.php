@@ -18,6 +18,6 @@
 ##                                                                         ##
 #############################################################################
 
-	require_once('../bootstrap.php');
+    require_once('../application/bootstrap.php');
 
-	header('Location: ./' . Config::DEFAULT_MODULE);
+    Config::home();

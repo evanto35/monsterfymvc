@@ -18,6 +18,6 @@
 ##                                                                         ##
 #############################################################################
 
-	require_once('../../bootstrap.php');
-	
-	new DashboardController();
+    require_once('../../application/bootstrap.php');
+
+    new DashboardController();

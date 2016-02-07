@@ -21,3 +21,35 @@ body {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
 }
+
+.lateral-toolbar {
+    float:left;
+    width:15%;
+    padding: 5px;
+}
+
+.main-content {
+    float:right;
+    width:85%;
+    padding:20px;
+}
+
+.monsterfy-footer{
+    position:absolute;
+    bottom:0px;
+    padding:5px;
+    left:0px;
+    width:100%;
+    clear: both;
+}
+
+.cell-actions{
+    padding:3px;
+    width:8%;
+}
+
+.btn-cell{
+    width:24px;
+    height:24px;
+    padding:0px;
+}

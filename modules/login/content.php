@@ -16,24 +16,24 @@
 
         <title><?php echo Config::APP_TITLE; ?> - Login</title>
 
-        <link rel="icon" type="image/png" href="<?php echo APP_REMOTE_PATH; ?>/assets/images/favicon.png">
+        <link rel="icon" type="image/png" href="<?php echo PATH_IMAGE; ?>favicon.png">
 
         <!-- jQuery -->
-        <script type="text/javascript" src="<?php echo APP_REMOTE_PATH; ?>/assets/js/jquery.min.js"></script>
+        <script type="text/javascript" src="<?php echo PATH_JS; ?>vendor/jquery.min.js"></script>
         
         <!-- Bootstrap core CSS -->
-        <link href="<?php echo APP_REMOTE_PATH; ?>/assets/css/bootstrap.min.css" rel="stylesheet">
-        <link href="<?php echo APP_REMOTE_PATH; ?>/assets/css/bootstrap-theme.min.css" rel="stylesheet">
-        <link href="<?php echo APP_REMOTE_PATH; ?>/assets/css/bootstrap-theme.css.map">
-        <script src="<?php echo APP_REMOTE_PATH; ?>/assets/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="<?php echo PATH_CSS; ?>bootstrap.min.css">
+        <link rel="stylesheet" href="<?php echo PATH_CSS; ?>bootstrap-theme.min.css">
+        <link rel="stylesheet" href="<?php echo PATH_CSS; ?>bootstrap-theme.css.map">
+        <script src="<?php echo PATH_JS; ?>vendor/bootstrap.min.js"></script>
           
-        <link href="<?php echo APP_REMOTE_PATH; ?>/assets/css/login.css" rel="stylesheet">
+        <link rel="stylesheet" href="<?php echo PATH_CSS; ?>login.css" rel="stylesheet">
     </head>
 
     <body>
         <section id="headline2">
             <div class="container">
-                <h1 id="title"><?php echo Config::APP_TITLE; ?></h1>
+                <img src="<?php echo PATH_IMAGE; ?>/logo-login.png" alt="" />
             </div>
         </section>
 
