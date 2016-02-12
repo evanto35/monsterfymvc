@@ -117,7 +117,11 @@ abstract class Lib {
         return $Target;
     }
 
-    public static function arrayToDto(array $source, $dtoClass) {
+    public static function arrayToDto(array $source, $dtoClass = '') {
+        if (empty($dtoClass)) {
+            if (!empty($source['_explicitType'])) $dtoClass = $source['_explicitType'];
+            else                                  $dtoClass = 'stdClass';
+        }
         $dto        = new $dtoClass();
         $properties = get_object_vars($dto);
 
